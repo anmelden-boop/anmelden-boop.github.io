@@ -429,21 +429,21 @@
       <p class="muted small" style="margin:0 0 10px">${drive(r)} · Sprit ${eur(fuelCost(r))}</p>
       <div class="form">
         <label>Datum <input type="date" id="ciDate" value="${date || today()}" max="${today()}"></label>
-        <label>Tageskarte hätte gekostet <input type="number" id="ciPrice" inputmode="decimal" step="0.5" min="0" value="${p ?? ''}" placeholder="€"></label>
+        <label>Tageskarte hätte gekostet <b class="num">${p != null ? eur(p) : '–'}</b></label>
       </div>
+      <p class="note">${p != null ? 'Den Preis änderst du im Gebiet unter „Infos &amp; Links“.' : 'Für dieses Gebiet ist kein Preis hinterlegt – trag ihn zuerst im Gebiet unter „Infos &amp; Links“ ein.'}</p>
       <p class="note" id="ciErr" style="color:var(--red)"></p>
-      <button class="btn primary wide" id="ciGo">Skitag eintragen</button>`);
+      <button class="btn primary wide" id="ciGo"${p == null ? ' disabled' : ''}>Skitag eintragen</button>`);
     $('#ciGo').onclick = () => {
-      const d = $('#ciDate').value, pr = parseFloat(String($('#ciPrice').value).replace(',', '.'));
+      const d = $('#ciDate').value, pr = p;
       if (!d) { $('#ciErr').textContent = 'Bitte ein Datum wählen.'; return; }
-      if (isNaN(pr) || pr < 0) { $('#ciErr').textContent = 'Bitte den Tageskartenpreis eintragen.'; return; }
+      if (pr == null || isNaN(pr)) { $('#ciErr').textContent = 'Bitte zuerst im Gebiet den Tageskartenpreis eintragen.'; return; }
       const same = S.checkins.find(c => c.date === d);
       if (same && !$('#ciGo').dataset.confirm) {
         $('#ciErr').textContent = `Am ${fmtDate(d)} bist du schon in ${byId[same.id]?.name || same.id} eingecheckt. Nochmal tippen ersetzt den Eintrag.`;
         $('#ciGo').dataset.confirm = '1'; return;
       }
       if (same) S.checkins = S.checkins.filter(c => c !== same);
-      if (S.prices[id] == null && r.price == null) S.prices[id] = pr; // unbekannten Preis merken
       S.checkins.push({ date: d, id, price: pr, fuel: Math.round(fuelCost(r) * 100) / 100 });
       S.checkins.sort((a, b) => a.date.localeCompare(b.date));
       save(); closeModal(); drawPins();
