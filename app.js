@@ -493,8 +493,9 @@
       save(); closeModal(); drawPins();
       if (current) renderDetail(current);
       const bal = balance();
-      if (bal.saved >= 0 && bal.saved - pr < 0) celebrate(bal.saved);
-      toast(bal.saved >= 0 ? `Eingecheckt · ${eur(bal.saved)} gespart` : `Eingecheckt · noch ${eur(-bal.saved)} bis der Pass sich lohnt`);
+      showHello({ quote: pickCheckinQuote() || pickQuote(), gain: pr });
+      // Pass amortisiert: jedes Mal Glückwunsch, beim ersten Mal groß mit Konfetti, danach kompakter
+      if (bal.saved >= 0) setTimeout(() => celebrate(bal.saved, bal.saved - pr < 0), 3200);
     };
   }
   const fmtDate = d => new Date(d + 'T12:00').toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' });
@@ -509,20 +510,22 @@
     });
   }
   // Kleine Animation, wenn der Pass sich gerade gelohnt hat (Bilanz springt über 0 €)
-  function celebrate(saved) {
-    const box = document.createElement('div'); box.className = 'party'; box.setAttribute('role', 'status');
+  function celebrate(saved, first) {
+    const box = document.createElement('div'); box.className = 'party' + (first ? '' : ' small'); box.setAttribute('role', 'status');
     const cols = ['#e3a90f', '#5a9e2a', '#2f7fd8', '#e0483e', '#ef9f27', '#8fb3d9'];
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let bits = '';
-    if (!reduce) for (let i = 0; i < 70; i++) {
+    if (!reduce) for (let i = 0; i < (first ? 70 : 24); i++) {
       const x = Math.random() * 100, dx = (Math.random() - .5) * 60, rot = Math.random() * 720, del = Math.random() * .4, dur = 1.6 + Math.random() * 1.2;
       bits += `<i style="left:${x}%;background:${cols[i % cols.length]};--dx:${dx}vw;--rot:${rot}deg;animation-delay:${del}s;animation-duration:${dur}s"></i>`;
     }
-    box.innerHTML = bits + `<div class="partyCard"><div class="partyBig">🎉</div><b>Der Pass hat sich gelohnt!</b><span class="num">+${eur(saved)} gespart</span></div>`;
+    box.innerHTML = bits + (first
+      ? `<div class="partyCard"><div class="partyBig">🎉</div><b>Der Pass hat sich gelohnt!</b><span>Glückwunsch, du hast diese Saison bereits</span><span class="num">${eur(saved)} gespart</span></div>`
+      : `<div class="partyCard"><b>Glückwunsch!</b><span>Diese Saison schon <b class="num">${eur(saved)}</b> gespart.</span></div>`);
     document.body.appendChild(box);
     if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
     box.onclick = () => box.remove();
-    setTimeout(() => box.remove(), 3800);
+    setTimeout(() => box.remove(), first ? 4500 : 3200);
   }
   function balance() {
     const value = S.checkins.reduce((a, c) => a + c.price, 0);
@@ -917,23 +920,26 @@
     try { localStorage.setItem(QKEY, JSON.stringify(recent)); } catch (e) { }
     return t;
   }
-  let helloTimer = null;
+  let helloTimer = null, helloSteps = [];
   function closeHello() {
-    const el = document.getElementById('hello'); clearTimeout(helloTimer); if (!el) return;
+    const el = document.getElementById('hello'); clearTimeout(helloTimer); helloSteps.forEach(clearTimeout); helloSteps = []; if (!el) return;
     el.classList.remove('in'); setTimeout(() => el.remove(), 320);
   }
-  function showHello() {
-    const q = pickQuote(); if (!q) return;
+  // opt.gain: Preis des gerade eingecheckten Skitags → Balken läuft erst bis zum alten Stand, nach 0,5 s kommt der neue Teil dazu
+  function showHello(opt = {}) {
+    const q = opt.quote || pickQuote(); if (!q) return;
+    clearTimeout(helloTimer); helloSteps.forEach(clearTimeout); helloSteps = [];
     document.getElementById('hello')?.remove();
-    const b = balance(), pass = S.settings.pass || 0, f = pass ? Math.max(0, Math.min(1, b.value / pass)) : 0, done = f >= 1;
+    const b = balance(), pass = S.settings.pass || 0, frac = v => pass ? Math.max(0, Math.min(1, v / pass)) : 0;
+    const f = frac(b.value), f0 = opt.gain ? frac(b.value - opt.gain) : 0, done = f >= 1;
     const el = document.createElement('div'); el.id = 'hello'; el.setAttribute('role', 'status');
+    const right = done ? `+${eur0(b.saved)} gespart` : `noch ${eur0(-b.saved)} offen`;
+    const left = opt.gain ? `+${eur0(opt.gain)} heute · ${Math.round(f * 100)} %` : (done ? '✓ Pass bezahlt' : `${Math.round(f * 100)} % abgefahren`);
     el.innerHTML = `
       <button class="hX" aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       <div class="hQ">${esc(q)}</div>
-      <div class="hBar ${done ? 'done' : ''}"><i class="hR"></i></div>
-      <div class="hSub num">${done
-        ? `<span>✓ Pass bezahlt</span><span>+${eur0(b.saved)} gespart</span>`
-        : `<span>${Math.round(f * 100)} % abgefahren</span><span>noch ${eur0(-b.saved)} offen</span>`}</div>
+      <div class="hBar"><i class="hG"></i></div>
+      <div class="hSub num"><span>${left}</span><span>${right}</span></div>
       <i class="hTime"></i>`;
     document.body.appendChild(el);
     el.querySelector('.hX').onclick = e => { e.stopPropagation(); closeHello(); };
@@ -941,12 +947,24 @@
     let y0 = null;
     el.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
     el.addEventListener('touchmove', e => { if (y0 != null && e.touches[0].clientY - y0 < -25) { y0 = null; closeHello(); } }, { passive: true });
+    const g = el.querySelector('.hG'), w = v => `${(v * 100).toFixed(1)}%`;
     requestAnimationFrame(() => requestAnimationFrame(() => {
       el.classList.add('in');
-      // grüner Balken = Passpreis; Rot frisst ihn von rechts bis auf den abgefahrenen Anteil auf
-      setTimeout(() => { const r = el.querySelector('.hR'); if (r) r.style.width = `${((1 - f) * 100).toFixed(1)}%`; }, 600);
+      // Balken beginnt rot; Grün wächst von links bis zum abbezahlten Anteil
+      if (!opt.gain) { helloSteps.push(setTimeout(() => { g.style.width = w(f); }, 600)); return; }
+      helloSteps.push(setTimeout(() => { g.style.width = w(f0); }, 500));                       // bisheriger Stand (1,4 s)
+      helloSteps.push(setTimeout(() => { g.classList.add('gain'); g.style.width = w(f); }, 500 + 1400 + 500)); // nach 0,5 s: heutiger Skitag
     }));
     helloTimer = setTimeout(closeHello, HELLO_MS);
+  }
+  function pickCheckinQuote() {
+    const Q = window.CHECKIN_QUOTES || [], minus = balance().saved < 0; if (!Q.length) return null;
+    let recent = []; try { recent = JSON.parse(localStorage.getItem(QKEY + '-ci') || '[]'); } catch (e) { }
+    const all = Q.map((q, i) => [i, q]).filter(([, q]) => minus || !q.includes('{minus}'));
+    const pool = all.filter(x => !recent.includes(x[0])), src = pool.length ? pool : all;
+    const [i, t] = src[Math.floor(Math.random() * src.length)];
+    try { localStorage.setItem(QKEY + '-ci', JSON.stringify([i, ...recent].slice(0, Math.floor(Q.length * 0.7)))); } catch (e) { }
+    return t.replace('{minus}', '');
   }
 
   // Start

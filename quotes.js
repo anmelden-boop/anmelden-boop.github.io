@@ -185,3 +185,48 @@ window.QUOTES = [
   'Wer liegt, verliert. Wer fährt, gewinnt.',
   'Erst die Piste, dann die Pflicht.'
 ];
+
+/* Sprüche beim Einchecken: Bestätigung, Geld gespart, leicht schwäbisch.
+   {minus} = nur zeigen, solange der Pass noch nicht abbezahlt ist (wird ausgeblendet). */
+window.CHECKIN_QUOTES = [
+  'Sauber! Wieder eine Tageskarte gespart.',
+  'So isch’s recht: Der Pass schafft, du fährst.',
+  'Gut gemacht! Das Gesparte reicht locker für eine Portion Maultaschen.',
+  'Eingecheckt und Geld gespart – die schwäbische Hausfrau wäre stolz.',
+  'Läuft bei dir. Und zwar bergab.',
+  '{minus}Wieder ein Stück vom Pass abgefahren. Weiter so!',
+  'Die Tageskarte bleibt heute ungekauft. Bestes Gefühl.',
+  'Viel Spaß auf der Piste – das Vesper ist hoffentlich im Rucksack.',
+  'Heute gespart, heute Abend Kässpätzle verdient.',
+  'Sparen und Spaß haben gleichzeitig. Geht also doch.',
+  'Offiziell bestätigt: Sparfuchs auf Ski.',
+  'Dein Bausparvertrag ist gerade ein bisschen neidisch.',
+  'Ha, so goht des! Viel Spaß heute.',
+  'Gespart ist gespart. Davon gibt’s später eine Butterbrezel extra.',
+  'Gute Entscheidung. Die Vorlesung hätte dir keinen Cent gespart.',
+  '{minus}Wieder ein Schritt Richtung schwarze Null.',
+  'Kehrwoche? Morgen. Heute ist Skitag.',
+  'Mit jedem Schwung wird dein Pass ein bisschen billiger.',
+  'Gut gmacht. Jetzt aber nix wie nauf.',
+  'Ein Tag mehr am Berg, ein paar Euro mehr im Studentenbudget.',
+  'Tüftler-Weisheit: Mehr Skitage = billigere Skitage.',
+  'Effizienter hätten das die Ingenieure vom Daimler auch nicht hinbekommen.',
+  'Dein Pass freut sich. Dein Konto auch.',
+  'Schee isch’s! Genieß den Tag.',
+  'Dafür hast du gespart. Jetzt wird gefahren.',
+  'Vesper dabei, Pass dabei – alles richtig gemacht.',
+  'So spart man als Student: mit Stil und mit Skiern.',
+  'Keine Tageskarte gekauft. Der Schwabe in dir jubelt leise.',
+  'Gut investiert. Die Rendite gibt’s in Höhenmetern.',
+  'Bravo! Deine Kosten pro Skitag sinken gerade.',
+  'Ned gschimpft isch globt gnug – aber heute gibt’s ausnahmsweise ein Lob: super!',
+  'Wieder einen Tag rausgeholt. Weiter so!',
+  'Ein Viertele Trollinger heute Abend ist jetzt drin. Eins.',
+  'Das nennt man Haushalten mit Pulverschnee.',
+  'Check! Dein Pass macht heute Überstunden für dich.',
+  'Die Spätzle können warten. Erst wird gefahren.',
+  'Deine Fixkosten haben gerade ein bisschen Angst bekommen.',
+  'Viel Spaß – und denk dran: Die Hütte ist teuer, die Seele im Rucksack nicht.',
+  'Gespart wird am Lift, nicht am Spaß.',
+  '{minus}Weiter so! Bald fährt dein Pass nur noch Gewinn ein.'
+];
