@@ -281,7 +281,7 @@
     $('#detailView').hidden = false;
     renderDetail(id);
     $('#sheetBody').scrollTop = 0;
-    setSheet('half');
+    setSheet('detail');
     if (fly) {
       const z = Math.max(map.getZoom(), 11);
       const p = map.project([r.lat, r.lon], z);
@@ -293,7 +293,9 @@
     current = null;
     $('#detailView').hidden = true;
     $('#listView').hidden = false;
+    $('#ciBar').hidden = true;
     renderList();
+    if (sheet.dataset.state === 'detail') setSheet('half');
   }
   const mtn = on => `<svg viewBox="0 0 30 22"><path d="M1 21 L11 5 L16 12 L20 7 L29 21 Z" style="fill:${on ? 'var(--ink)' : 'none'};stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round" opacity="${on ? 1 : .35}"/>${on ? '<path d="M8.6 9 L11 5 L13.4 9 L11.8 8 L11 9.2 L10.2 8 Z" style="fill:var(--card)"/>' : ''}</svg>`;
   function renderDetail(id) {
@@ -309,6 +311,7 @@
     const checkedToday = S.checkins.find(c => c.date === today() && c.id === id);
     const fc = fuelCost(r);
     const p = priceOf(r);
+    const kmTxt = r.km ? r.km.toLocaleString('de-DE') + ' km' : '–';
     $('#detailView').innerHTML = `
       <div class="dHead">
         <button class="iconBtn" data-act="back" aria-label="Zurück zur Liste"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -316,15 +319,21 @@
         <button class="iconBtn star ${isFav(id) ? 'on' : ''}" data-act="fav" aria-label="Favorit"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
       </div>
       <div class="metrics num">
-        <div><span>Fahrtzeit</span><b>${hm(driveMin(r))}</b><small>${Math.round(roadKm(r))} km</small></div>
+        <div title="ab ${esc(home.name)}"><span>Anfahrt</span><b>${hm(driveMin(r))}</b><small>${Math.round(roadKm(r))} km</small><small>${eur(fc)} Sprit</small></div>
         <div><span>Lifte offen</span><b>${r.noSki ? '–' : liftsTxt(r)}</b><small>${lifts[r.id] ? 'live 3Täler' : 'kein Status'}</small></div>
         <div><span>Sicht heute</span><b>${starsOf(id, 0) != null ? num1(starsOf(id, 0)) : '–'}</b>${starsHTML(starsOf(id, 0))}</div>
         <div><span>Sicht morgen</span><b>${starsOf(id, 1) != null ? num1(starsOf(id, 1)) : '–'}</b>${starsHTML(starsOf(id, 1))}</div>
       </div>
-      ${podium[id] ? `<p class="medalNote"><span class="medal" style="background:${MEDAL[podium[id]]}">${podium[id]}</span> ${MEDALNAME[podium[id]]} – Platz ${podium[id]} der besten Bedingungen für morgen (Wetter, Schnee, Panorama, Größe, Anfahrt)</p>` : ''}
+      <div class="metrics2 num">
+        <div class="panoT"><span>Panorama (antippen)</span>
+          <span class="mtns">${[1, 2, 3, 4, 5].map(i => `<button data-pano="${i}" aria-label="Panorama ${i} von 5">${mtn(i <= pano)}</button>`).join('')}</span></div>
+        <div><span>Pisten</span><b>${kmTxt}</b>${r.routes ? `<small>+ ${r.routes.toLocaleString('de-DE')} km Routen</small>` : ''}</div>
+        <div><span>Höhe</span><b>${r.top ? r.top + ' m' : '–'}</b>${r.base ? `<small>Tal ${r.base} m</small>` : ''}</div>
+      </div>
+      ${podium[id] ? `<p class="medalNote"><span class="medal" style="background:${MEDAL[podium[id]]}">${podium[id]}</span> ${MEDALNAME[podium[id]]} – Platz ${podium[id]} der besten Bedingungen für morgen (Wetter, Schnee, Panorama, Größe, Lifte, Anfahrt)</p>` : ''}
       <div class="gallery">${gallery}</div>
-      <div class="drive num"><b>${drive(r)}</b> ab ${esc(home.name)} · Sprit hin + zurück <b>${eur(fc)}</b></div>
       ${r.noSki ? '<p class="note">Seilbahn zum Winterwandern – kein Skigebiet, zählt nicht als Skitag.</p>' : `
+      <div class="secT">Schnee</div>
       <div class="snowGrid num">
         <div class="gd"><b>${cm(s?.y)}</b><span>gestern</span></div>
         <div class="gy"><b>${cm(s?.t)}</b><span>heute</span></div>
@@ -333,26 +342,27 @@
       </div>
       <p class="note">Wettermodell für ${s ? s.elev : '–'} m, nicht der offizielle Pistenbericht. Übermorgen: ${cm(s?.d2)}.</p>`}
       ${wxHTML(r)}
-      <div class="pano"><span><b>Panorama</b><br><span class="muted small">Tippen zum Ändern</span></span>
-        <span class="mtns">${[1, 2, 3, 4, 5].map(i => `<button data-pano="${i}" aria-label="${i} von 5">${mtn(i <= pano)}</button>`).join('')}</span></div>
+      ${parkHTML(r)}
+      <div class="secT">Infos & Links</div>
       <dl class="rows num">
         ${r.noSki ? '' : `<div><dt>Tageskarte</dt><dd><input class="priceIn" type="number" inputmode="decimal" step="0.5" min="0" data-act="price" value="${p ?? ''}" placeholder="? €"> €</dd></div>`}
-        <div><dt>Pisten</dt><dd>${r.km ? r.km.toLocaleString('de-DE') + ' km' : '–'}${r.routes ? ` + ${r.routes.toLocaleString('de-DE')} km Skirouten` : ''}</dd></div>
-        <div><dt>Höhe</dt><dd>${r.base ? `${r.base}–${r.top} m` : (r.top ? r.top + ' m' : '–')}</dd></div>
-        <div><dt>Lifte</dt><dd>${r.lifts ?? '–'}</dd></div>
+        <div><dt>Lifte gesamt</dt><dd>${r.lifts ?? '–'}</dd></div>
+        <div><dt>Anfahrt ab</dt><dd>${esc(home.name)}</dd></div>
       </dl>
       ${r.mapOnly ? '<p class="note">Nur auf der 3Täler-Karte gelistet – Pisten/Preis von skiresort.com.</p>' : ''}
-      ${parkHTML(r)}
       <div class="btnGrid">
         <a class="btn" target="_blank" rel="noopener" href="${esc(r.web || r.link)}">${r.web && r.webKind === 'op' ? 'Website Skigebiet ↗' : 'Website (Ort) ↗'}</a>
+        <a class="btn" target="_blank" rel="noopener" href="${esc(r.link)}">Lifte & Pisten ↗</a>
         <a class="btn" target="_blank" rel="noopener" href="https://maps.apple.com/?saddr=${home.lat},${home.lon}&daddr=${r.lat},${r.lon}&dirflg=d">Route (Apple)</a>
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${r.lat},${r.lon}&travelmode=driving">Route (Google)</a>
-        <a class="btn" target="_blank" rel="noopener" href="${esc(r.link)}">Lifte & Pisten ↗</a>
         <a class="btn" target="_blank" rel="noopener" href="https://www.skiline.cc">Skiline ↗</a>
-      </div>
-      ${r.noSki ? '' : checkedToday
-        ? `<button class="btn primary done wide" data-act="undoToday">✓ Heute eingecheckt · ${eur(checkedToday.price)}</button>`
-        : `<button class="btn primary wide" data-act="checkin">Heute hier einchecken</button>`}`;
+      </div>`;
+    // Check-in-Leiste bleibt beim Scrollen unten sichtbar
+    $('#ciBar').innerHTML = r.noSki ? '' : checkedToday
+      ? `<button class="btn primary done wide" data-act="undoToday">✓ Heute eingecheckt · ${eur(checkedToday.price)}</button>`
+      : `<button class="btn primary wide" data-act="checkin">Heute hier einchecken · +${eur(p ?? 0)}</button>`;
+    $('#ciBar').hidden = !!r.noSki;
+    setSheet($('#sheet').dataset.state);
   }
   function parkHTML(r) {
     const P = r.parking || [];
@@ -373,6 +383,7 @@
       <div class="wxTwo">${d(w[0], 0)}${d(w[1], 1)}</div>
       <div class="wx7 num">${w.slice(0, 7).map((x, i) => `<div><span class="small">${dayName(x.date, i)}</span>${wIcon(x.code)}<b>${Math.round(x.tmax)}°</b><span class="muted small">${Math.round(x.tmin)}°</span><span class="small">${num1(x.stars)}<span class="sy">★</span></span></div>`).join('')}</div>`;
   }
+  $('#ciBar').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || !current) return; if (b.dataset.act === 'checkin') openCheckin(current); else if (b.dataset.act === 'undoToday') { const c = S.checkins.find(c => c.date === today() && c.id === current); if (c) removeCheckin(c); } });
   $('#detailView').addEventListener('click', e => {
     const b = e.target.closest('[data-act],[data-pano]');
     if (!b) return;
@@ -619,29 +630,34 @@
       ['Ein Gebiet im Detail', `<p>Oben vier Kacheln: <b>Fahrtzeit</b> ab deinem Wohnort, <b>offene Lifte</b> (live von 3Täler) und die <b>Sicht</b> heute und morgen in Sternen – 5 Sterne heißt Sonne ohne Wolken.</p><p>Darunter Wetter für 7 Tage, <b>Parkplätze</b> mit Link zu Google Maps und die Website des Gebiets.</p>`],
       ['Einchecken lohnt sich', `<p>Tippe im Gebiet auf <b>„Heute hier einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
       ['Filtern & Würfeln', `<p>Oben die <b>Filter</b>: ≤ 1 h Fahrt, Neuschnee, Favoriten, große Gebiete und gute Sicht heute oder morgen – kombinierbar.</p><p>Die Liste sortierst du nach <b>Fahrtzeit, Neuschnee oder Pisten-km</b>. Der <b>Würfel</b> lost ein Gebiet aus.</p>`],
-      ['Deine Daten', `<p>Favoriten, Skitage und Einstellungen liegen <b>nur auf diesem Gerät</b> – kein Konto, nichts wird hochgeladen.</p><p>Tipp: Über Teilen → <b>„Zum Home-Bildschirm“</b> als App speichern und ab und zu in der Bilanz eine <b>Sicherung</b> machen.</p>`]
+      ['Deine Daten', `<p>Favoriten, Skitage und Einstellungen liegen <b>nur auf diesem Gerät</b> – kein Konto, nichts wird hochgeladen.</p><p>Tipp: Über Teilen → <b>„Zum Home-Bildschirm“</b> als App speichern und ab und zu in der Bilanz eine <b>Sicherung</b> machen.</p>`],
+      ['Bitte beachten', `<p><b>Keine offizielle Software.</b> Diese App ist ein privates Projekt und steht in keiner Verbindung zum 3TälerPass oder zu den Liftbetreibern.</p><p>Alle Angaben (Schnee, Wetter, Lifte, Preise, Fahrtzeiten, Parkplätze) ohne Gewähr – maßgeblich sind die offiziellen Seiten. <b>Es wird keine Haftung übernommen.</b></p><p>Nutzung nur <b>privat und nicht kommerziell</b>. Kopieren, Weitergeben des Codes oder Nachbauen ist nicht erlaubt.</p>`]
     ];
     let i = start || 0;
     const show = () => {
       const [h, body] = steps[i];
       modal(`<div class="tour">
-        <div class="mHead"><div class="h2">${h}</div><button class="iconBtn" data-tour="skip" aria-label="Einführung schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div class="mHead"><div class="h2">${h}</div><span class="muted small num">${i + 1}/${steps.length}</span></div>
         <div class="tBody">${body}</div>
         <div class="tDots">${steps.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
-        <div class="btnGrid">${i ? '<button class="btn" data-tour="back">Zurück</button>' : '<button class="btn" data-tour="skip">Überspringen</button>'}<button class="btn primary" data-tour="next">${i === steps.length - 1 ? 'Los geht’s' : 'Weiter'}</button></div></div>`, 'tour');
+        <div class="btnGrid">${i ? '<button class="btn" data-tour="back">Zurück</button>' : '<span></span>'}<button class="btn primary" data-tour="next">${i === steps.length - 1 ? 'Verstanden – los geht’s' : 'Weiter'}</button></div></div>`, 'tour');
       $('#modal').querySelectorAll('[data-tour]').forEach(b => b.onclick = e => {
         e.stopPropagation();
         const a = b.dataset.tour;
         if (a === 'next' && i < steps.length - 1) { i++; show(); return; }
         if (a === 'back') { i--; show(); return; }
-        S.toured = true; save(); closeModal();
+        if (a === 'next') { S.toured = true; save(); closeModal(); }
       });
     };
     show();
   }
   function modal(html, kind) { $('#modal').innerHTML = html; $('#modal').dataset.kind = kind || ''; $('#modalWrap').hidden = false; }
   function closeModal() { $('#modalWrap').hidden = true; $('#modal').innerHTML = ''; }
-  $('#modalWrap').addEventListener('click', e => { if (e.target.id === 'modalWrap' || e.target.closest('[data-close]')) closeModal(); });
+  $('#modalWrap').addEventListener('click', e => {
+    const k = $('#modal').dataset.kind;
+    if (k === 'tour' || (k === 'home' && !S.home)) return; // Einführung und erster Wohnort lassen sich nicht wegklicken
+    if (e.target.id === 'modalWrap' || e.target.closest('[data-close]')) closeModal();
+  });
 
   // Hinweis unten
   let toastT;
@@ -656,13 +672,15 @@
   // Ausziehbares Blatt: peek (Liste angedeutet) / half / full
   const sheet = $('#sheet');
   const H = () => sheet.getBoundingClientRect().height;
-  const VIS = { peek: () => 150, half: () => Math.round(window.innerHeight * .5), full: () => H() };
+  const VIS = { peek: () => 150, half: () => Math.round(window.innerHeight * .5), detail: () => Math.min(H(), Math.round(window.innerHeight * .74)), full: () => H() };
   const sheetVisible = () => VIS[sheet.dataset.state]();
   function setSheet(state) {
     sheet.dataset.state = state;
     sheet.style.transform = `translateY(${H() - VIS[state]()}px)`;
     // Der nach unten verschobene Teil des Blatts ist unsichtbar → genauso viel Platz unten anhängen, damit man alles erreicht
-    $('#sheetBody').style.paddingBottom = `calc(${H() - VIS[state]()}px + env(safe-area-inset-bottom) + 14px)`;
+    const bar = !$('#ciBar').hidden;
+    $('#sheetBody').style.paddingBottom = `calc(${H() - VIS[state]()}px + env(safe-area-inset-bottom) + ${bar ? 84 : 14}px)`;
+    $('#ciBar').style.bottom = (H() - VIS[state]()) + 'px';
     $('#fabs').style.bottom = (Math.min(VIS[state](), VIS.half()) + 14) + 'px';
     $('#fabs').style.visibility = state === 'full' ? 'hidden' : 'visible';
   }
@@ -684,10 +702,10 @@
     if (!drag) return;
     sheet.classList.remove('dragging');
     if (!drag.moved) { // Tippen auf den Griff wechselt die Höhe
-      setSheet({ peek: 'half', half: 'full', full: 'peek' }[sheet.dataset.state]);
+      setSheet({ peek: 'half', half: 'full', detail: 'full', full: 'peek' }[sheet.dataset.state]);
     } else {
       const vis = H() - (drag.start + (e.clientY - drag.y));
-      const opts = ['peek', 'half', 'full'].map(s => [s, Math.abs(VIS[s]() - vis)]).sort((a, b) => a[1] - b[1]);
+      const opts = (current ? ['peek', 'half', 'detail', 'full'] : ['peek', 'half', 'full']).map(s => [s, Math.abs(VIS[s]() - vis)]).sort((a, b) => a[1] - b[1]);
       setSheet(opts[0][0]);
     }
     drag = null;
