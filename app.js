@@ -35,7 +35,7 @@
   const drive = r => `${Math.round(roadKm(r))} km · ${hm(driveMin(r))}`;
   const fuelCost = r => 2 * roadKm(r) * S.settings.cons / 100 * S.settings.fuel;
   const priceOf = r => (S.prices[r.id] != null ? S.prices[r.id] : r.price);
-  const panoOf = r => S.pano[r.id] || r.pano;
+  const panoOf = r => r.pano; // fest vorgegeben, nicht änderbar
   const isFav = id => S.favs.includes(id);
   const sizeKm = r => (r.km > 0 ? r.km : (r.routes || 0));
   const color = r => r.noSki ? '#9a9a9a' : sizeKm(r) >= 25 ? '#2f7fd8' : sizeKm(r) >= 8 ? '#ef9f27' : '#e0483e';
@@ -325,8 +325,8 @@
         <div><span>Sicht morgen</span><b>${starsOf(id, 1) != null ? num1(starsOf(id, 1)) : '–'}</b>${starsHTML(starsOf(id, 1))}</div>
       </div>
       <div class="metrics2 num">
-        <div class="panoT"><span>Panorama (antippen)</span>
-          <span class="mtns">${[1, 2, 3, 4, 5].map(i => `<button data-pano="${i}" aria-label="Panorama ${i} von 5">${mtn(i <= pano)}</button>`).join('')}</span></div>
+        <div class="panoT"><span>Panorama</span>
+          <span class="mtns" role="img" aria-label="Panorama ${pano} von 5">${[1, 2, 3, 4, 5].map(i => `<i>${mtn(i <= pano)}</i>`).join('')}</span></div>
         <div><span>Pisten</span><b>${kmTxt}</b>${r.routes ? `<small>+ ${r.routes.toLocaleString('de-DE')} km Routen</small>` : ''}</div>
         <div><span>Höhe</span><b>${r.top ? r.top + ' m' : '–'}</b>${r.base ? `<small>Tal ${r.base} m</small>` : ''}</div>
       </div>
@@ -359,8 +359,8 @@
       </div>`;
     // Check-in-Leiste bleibt beim Scrollen unten sichtbar
     $('#ciBar').innerHTML = r.noSki ? '' : checkedToday
-      ? `<button class="btn primary done wide" data-act="undoToday">✓ Heute eingecheckt · ${eur(checkedToday.price)}</button>`
-      : `<button class="btn primary wide" data-act="checkin">Heute hier einchecken · +${eur(p ?? 0)}</button>`;
+      ? `<button class="btn primary done ciBtn" data-act="undoToday"><b>✓ Eingecheckt</b><small>${eur(checkedToday.price)} gespart</small></button>`
+      : `<button class="btn primary ciBtn" data-act="checkin"><b>Einchecken</b><small>+${eur(p ?? 0)} gespart</small></button>`;
     $('#ciBar').hidden = !!r.noSki;
     setSheet($('#sheet').dataset.state);
   }
@@ -385,10 +385,9 @@
   }
   $('#ciBar').addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (!b || !current) return; if (b.dataset.act === 'checkin') openCheckin(current); else if (b.dataset.act === 'undoToday') { const c = S.checkins.find(c => c.date === today() && c.id === current); if (c) removeCheckin(c); } });
   $('#detailView').addEventListener('click', e => {
-    const b = e.target.closest('[data-act],[data-pano]');
+    const b = e.target.closest('[data-act]');
     if (!b) return;
     const id = current, r = byId[id];
-    if (b.dataset.pano) { S.pano[id] = +b.dataset.pano; save(); renderDetail(id); return; }
     switch (b.dataset.act) {
       case 'back': closeDetail(); break;
       case 'fav': S.favs = isFav(id) ? S.favs.filter(x => x !== id) : S.favs.concat(id); save(); drawPins(); renderDetail(id); break;
@@ -679,7 +678,7 @@
     sheet.style.transform = `translateY(${H() - VIS[state]()}px)`;
     // Der nach unten verschobene Teil des Blatts ist unsichtbar → genauso viel Platz unten anhängen, damit man alles erreicht
     const bar = !$('#ciBar').hidden;
-    $('#sheetBody').style.paddingBottom = `calc(${H() - VIS[state]()}px + env(safe-area-inset-bottom) + ${bar ? 84 : 14}px)`;
+    $('#sheetBody').style.paddingBottom = `calc(${H() - VIS[state]()}px + env(safe-area-inset-bottom) + ${bar ? 72 : 14}px)`;
     $('#ciBar').style.bottom = (H() - VIS[state]()) + 'px';
     $('#fabs').style.bottom = (Math.min(VIS[state](), VIS.half()) + 14) + 'px';
     $('#fabs').style.visibility = state === 'full' ? 'hidden' : 'visible';
