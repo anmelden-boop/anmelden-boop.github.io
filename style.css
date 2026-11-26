@@ -150,10 +150,13 @@ textarea{width:100%;min-height:90px;font:13px ui-monospace,monospace;color:var(-
 .st .e{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-linejoin:round}
 .st .f{fill:#f2b01e}
 .sy{color:#f2b01e;margin-left:1px}
-.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:2px 0 10px}
-.metrics>div{background:var(--bg);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0}
-.metrics span:first-child{font-size:12px;color:var(--muted)}
-.metrics b{font-size:20px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:2px 0 10px}
+.metrics>div{background:var(--bg);border-radius:12px;padding:7px 7px 8px;display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden}
+.metrics>div>span:first-child{font-size:11px;color:var(--muted);white-space:nowrap}
+.metrics b{font-size:18px;line-height:1.15;white-space:nowrap}
+.metrics small{font-size:11px;color:var(--muted);white-space:nowrap}
+.metrics .stars{gap:0}
+.metrics .st{width:11px;height:11px}
 .medal{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;color:#fff;font-size:11px;font-weight:700;margin-right:6px;vertical-align:1px;flex:none}
 .medalNote{display:flex;align-items:flex-start;gap:2px;font-size:13px;margin:0 0 10px;color:var(--muted)}
 #podium{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;align-items:center;scrollbar-width:none}
@@ -169,3 +172,30 @@ textarea{width:100%;min-height:90px;font:13px ui-monospace,monospace;color:var(-
 .wi .bolt{stroke:#e9a417}
 .wx7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:8px 0 4px;text-align:center}
 .wx7>div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;background:var(--bg)}
+
+/* Parkplätze */
+.park{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.park a{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--bg);color:var(--ink);text-decoration:none}
+.park .pIcon{flex:none;width:30px;height:30px;border-radius:8px;background:#2f6fd1;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.park .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.park .go{flex:none;font-size:13px;color:var(--accent);font-weight:600}
+/* Animation: Pass hat sich gelohnt */
+.party{position:fixed;inset:0;z-index:5000;pointer-events:auto;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18)}
+.party i{position:absolute;top:-4vh;width:9px;height:14px;border-radius:2px;animation-name:fall;animation-timing-function:cubic-bezier(.25,.6,.4,1);animation-fill-mode:forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.9}}
+.partyCard{background:var(--card);color:var(--ink);border-radius:20px;padding:20px 26px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:var(--shadow);animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;font-size:17px}
+.partyCard .num{color:var(--green);font-weight:700;font-size:22px}
+.partyBig{font-size:46px;line-height:1}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion: reduce){.partyCard{animation:none}}
+
+/* Einführung */
+.tour .tBody{min-height:190px;font-size:15px;line-height:1.45}
+.tour .tBody p{margin:0 0 10px}
+.tPin{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.tPin p{margin:0}
+.tLeg{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:13px}
+.tLeg span{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:-6px}
+.tDots{display:flex;justify-content:center;gap:6px;margin:6px 0 12px}
+.tDots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tDots i.on{background:var(--ink);width:18px;border-radius:4px}

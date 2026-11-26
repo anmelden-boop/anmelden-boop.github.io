@@ -91,7 +91,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.warth-schroecken.com",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Saloberjet II",
+"lat": 47.26792,
+"lon": 10.12619,
+"d": 252,
+"sz": "groß",
+"fee": 1,
+"lift": "Körbliftle"
+},
+{
+"n": "Tiefgarage Anger",
+"lat": 47.21048,
+"lon": 10.14292,
+"d": 90,
+"sz": "groß",
+"fee": 1,
+"lift": "Bergbahn Lech - Oberlech"
+},
+{
+"n": "Parkplatz Saloberjet",
+"lat": 47.26817,
+"lon": 10.12852,
+"d": 182,
+"sz": "groß",
+"fee": 1,
+"lift": "Körbliftle"
+}
+]
 },
 {
 "id": "damuels-mellau",
@@ -155,7 +184,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.damuels-mellau.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Indianer 1",
+"lat": 47.29088,
+"lon": 9.87965,
+"d": 70,
+"sz": "groß",
+"fee": 0,
+"lift": "Indianer 1"
+},
+{
+"n": "Parkplatz Uga-Express",
+"lat": 47.28627,
+"lon": 9.88724,
+"d": 70,
+"sz": "groß",
+"fee": 0,
+"lift": "Uga-Express"
+},
+{
+"n": "Parkplatz am Lift",
+"lat": 47.28461,
+"lon": 9.88791,
+"d": 227,
+"sz": "groß",
+"fee": 0,
+"lift": ""
+}
+]
 },
 {
 "id": "diedamskopf",
@@ -238,7 +296,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.diedamskopf.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Ahornlift",
+"lat": 47.31528,
+"lon": 10.00854,
+"d": 147,
+"sz": "groß",
+"fee": null,
+"lift": "Ahornlift"
+},
+{
+"n": "Parkplatz am Lift",
+"lat": 47.31673,
+"lon": 10.00887,
+"d": 46,
+"sz": "mittel",
+"fee": 0,
+"lift": ""
+},
+{
+"n": "Parkplatz am Lift",
+"lat": 47.32215,
+"lon": 9.98067,
+"d": 59,
+"sz": "mittel",
+"fee": 0,
+"lift": ""
+}
+]
 },
 {
 "id": "sonnenkopf",
@@ -289,7 +376,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://sonnenkopf.com/de/",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Sonnenkopfbahn - Kelobar",
+"lat": 47.12814,
+"lon": 10.05478,
+"d": 117,
+"sz": "mittel",
+"fee": 0,
+"lift": "Sonnenkopfbahn"
+},
+{
+"n": "Parkplatz Sonnenkopfbahn",
+"lat": 47.12954,
+"lon": 10.05278,
+"d": 281,
+"sz": "groß",
+"fee": null,
+"lift": "Sonnenkopfbahn"
+},
+{
+"n": "Parkplatz Paludalift",
+"lat": 47.12301,
+"lon": 10.00121,
+"d": 130,
+"sz": "mittel",
+"fee": 0,
+"lift": "Paludalift"
+}
+]
 },
 {
 "id": "faschina",
@@ -340,7 +456,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.seilbahnen-faschina.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Faschinajoch",
+"lat": 47.27221,
+"lon": 9.90775,
+"d": 70,
+"sz": "mittel",
+"fee": 0,
+"lift": ""
+},
+{
+"n": "Faschina",
+"lat": 47.26902,
+"lon": 9.90715,
+"d": 148,
+"sz": "mittel",
+"fee": 0,
+"lift": "Guggernülli"
+}
+]
 },
 {
 "id": "balderschwang",
@@ -390,7 +526,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.skigebiet-balderschwang.de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Bolgengratbahn",
+"lat": 47.44222,
+"lon": 10.17587,
+"d": 91,
+"sz": "groß",
+"fee": 1,
+"lift": "Bolgengratbahn"
+},
+{
+"n": "Parkplatz Riedbergerhornbahn",
+"lat": 47.45683,
+"lon": 10.13063,
+"d": 74,
+"sz": "groß",
+"fee": 1,
+"lift": "Riedbergerhornbahn"
+},
+{
+"n": "Parkplatz Höflealplift",
+"lat": 47.46316,
+"lon": 10.10198,
+"d": 103,
+"sz": "groß",
+"fee": 0,
+"lift": "Höflealplift"
+}
+]
 },
 {
 "id": "laterns",
@@ -437,7 +602,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.laterns.net/winter",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Sommerrodelbahn Laterns",
+"lat": 47.26071,
+"lon": 9.74401,
+"d": 95,
+"sz": "groß",
+"fee": 1,
+"lift": "Sommerrodelbahn Laterns"
+},
+{
+"n": "Parkplatz Seilbahn Schnifisberg",
+"lat": 47.21495,
+"lon": 9.73222,
+"d": 15,
+"sz": "klein",
+"fee": null,
+"lift": "Seilbahn Schnifisberg"
+},
+{
+"n": "Parkplatz Sesselbahn Gapfohl",
+"lat": 47.26005,
+"lon": 9.73598,
+"d": 520,
+"sz": "mittel",
+"fee": 0,
+"lift": "Sesselbahn Gapfohl"
+}
+]
 },
 {
 "id": "boedele",
@@ -496,7 +690,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.boedele.info",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Haldenlift",
+"lat": 47.41569,
+"lon": 9.84342,
+"d": 134,
+"sz": "klein",
+"fee": null,
+"lift": "Haldenlift"
+},
+{
+"n": "Parkplatz Haldenlift",
+"lat": 47.41327,
+"lon": 9.84793,
+"d": 402,
+"sz": "mittel",
+"fee": 0,
+"lift": "Haldenlift"
+}
+]
 },
 {
 "id": "steibis",
@@ -543,7 +757,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.huendle-imberg.de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parken Imbergbahn",
+"lat": 47.52112,
+"lon": 10.02444,
+"d": 134,
+"sz": "groß",
+"fee": 0,
+"lift": "Imbergbahn"
+},
+{
+"n": "Parkplatz Kirchhanglift",
+"lat": 47.52723,
+"lon": 10.02697,
+"d": 178,
+"sz": "mittel",
+"fee": 1,
+"lift": "Kirchhanglift"
+},
+{
+"n": "Parkplatz Imbergbahn",
+"lat": 47.52047,
+"lon": 10.02239,
+"d": 56,
+"sz": "klein",
+"fee": null,
+"lift": "Imbergbahn"
+}
+]
 },
 {
 "id": "huendle",
@@ -582,7 +825,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.huendle-imberg.de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Hündlebahn",
+"lat": 47.55214,
+"lon": 10.05165,
+"d": 101,
+"sz": "groß",
+"fee": null,
+"lift": "Hündle Bahn"
+}
+]
 },
 {
 "id": "schetteregg",
@@ -641,7 +895,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.schetteregg.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Schlepplift Kopach",
+"lat": 47.41731,
+"lon": 9.98564,
+"d": 43,
+"sz": "mittel",
+"fee": 0,
+"lift": "Schlepplift Kopach"
+}
+]
 },
 {
 "id": "hochhaederich",
@@ -683,7 +948,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.alpenarena.com/de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Hochlittenlift",
+"lat": 47.50906,
+"lon": 9.98017,
+"d": 75,
+"sz": "groß",
+"fee": null,
+"lift": "Hochlittenlift"
+},
+{
+"n": "Parkplatz Hüttenlift",
+"lat": 47.50954,
+"lon": 9.9837,
+"d": 73,
+"sz": "mittel",
+"fee": null,
+"lift": "Hüttenlift"
+},
+{
+"n": "Parkplatz Hochlittenlift",
+"lat": 47.50816,
+"lon": 9.97826,
+"d": 230,
+"sz": "klein",
+"fee": null,
+"lift": "Hochlittenlift"
+}
+]
 },
 {
 "id": "hochgrat",
@@ -738,7 +1032,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://hochgrat.de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Hochgratbahn",
+"lat": 47.51005,
+"lon": 10.05982,
+"d": 146,
+"sz": "groß",
+"fee": 1,
+"lift": "Hochgratbahn"
+}
+]
 },
 {
 "id": "sonntag",
@@ -765,7 +1070,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.seilbahnen-sonntag.at/de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Pendelbahn Sonntag-Stein",
+"lat": 47.24018,
+"lon": 9.90704,
+"d": 136,
+"sz": "mittel",
+"fee": 0,
+"lift": "Pendelbahn Sonntag-Stein"
+},
+{
+"n": "P1",
+"lat": 47.23991,
+"lon": 9.90429,
+"d": 93,
+"sz": "klein",
+"fee": 0,
+"lift": "Pendelbahn Sonntag-Stein"
+}
+]
 },
 {
 "id": "raggal",
@@ -807,7 +1132,27 @@ window.RESORTS=[
 }
 ],
 "web": "http://www.skilifte-raggal.com",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Gafidura",
+"lat": 47.20873,
+"lon": 9.82646,
+"d": 381,
+"sz": "klein",
+"fee": null,
+"lift": "Gafidura"
+},
+{
+"n": "Parkplatz Tobel",
+"lat": 47.21184,
+"lon": 9.83914,
+"d": 438,
+"sz": "klein",
+"fee": null,
+"lift": "Tobel"
+}
+]
 },
 {
 "id": "joechelspitze",
@@ -841,7 +1186,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.lechtaler-bergbahnen.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Jöchelspitzbahn",
+"lat": 47.26762,
+"lon": 10.38399,
+"d": 51,
+"sz": "mittel",
+"fee": 0,
+"lift": "Jöchelspitzbahn"
+},
+{
+"n": "Parkplatz Babylift Jöchelspitze",
+"lat": 47.26906,
+"lon": 10.3876,
+"d": 192,
+"sz": "klein",
+"fee": null,
+"lift": "Babylift Jöchelspitze"
+}
+]
 },
 {
 "id": "niedere",
@@ -896,7 +1261,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.seilbahn-bezau.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Seilbahn Bezau",
+"lat": 47.38537,
+"lon": 9.92049,
+"d": 18,
+"sz": "groß",
+"fee": 0,
+"lift": "Seilbahn Bezau"
+}
+]
 },
 {
 "id": "hochlitten",
@@ -943,7 +1319,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.skilifte-hochlitten.com",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz am Lift",
+"lat": 47.50451,
+"lon": 9.96345,
+"d": 39,
+"sz": "mittel",
+"fee": 0,
+"lift": ""
+}
+]
 },
 {
 "id": "alberschwende",
@@ -969,7 +1356,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.skilifte-alberschwende.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Zipfellift 2.0",
+"lat": 47.45147,
+"lon": 9.83274,
+"d": 346,
+"sz": "klein",
+"fee": 0,
+"lift": "Zipfellift 2.0"
+},
+{
+"n": "Parkplatz Zipfellift 2.0",
+"lat": 47.4499,
+"lon": 9.83054,
+"d": 494,
+"sz": "klein",
+"fee": null,
+"lift": "Zipfellift 2.0"
+}
+]
 },
 {
 "id": "groellerkopf",
@@ -999,7 +1406,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.uebersaxen.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Gischlangs",
+"lat": 47.25818,
+"lon": 9.68167,
+"d": 46,
+"sz": "mittel",
+"fee": 0,
+"lift": "Schilift Gröllerkopf"
+}
+]
 },
 {
 "id": "heumoeser",
@@ -1023,7 +1441,8 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/ebnitwintercdornbirnerseilbahnag.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"parking": []
 },
 {
 "id": "holzgau",
@@ -1053,7 +1472,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.lechtal.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Gföllberglift",
+"lat": 47.26075,
+"lon": 10.34337,
+"d": 95,
+"sz": "mittel",
+"fee": 1,
+"lift": "Gföllberglift"
+},
+{
+"n": "Parkplatz Gföllberglift",
+"lat": 47.2585,
+"lon": 10.34367,
+"d": 311,
+"sz": "mittel",
+"fee": 1,
+"lift": "Gföllberglift"
+}
+]
 },
 {
 "id": "hittisberg",
@@ -1088,7 +1527,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.hittisau.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Skilift Hittisberg",
+"lat": 47.45684,
+"lon": 9.97718,
+"d": 114,
+"sz": "klein",
+"fee": 0,
+"lift": "Skilift Hittisberg"
+}
+]
 },
 {
 "id": "kraehenberg",
@@ -1130,7 +1580,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.kraehenberg.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Krähenberglift",
+"lat": 47.41827,
+"lon": 10.04077,
+"d": 53,
+"sz": "groß",
+"fee": 0,
+"lift": "Krähenberglift"
+}
+]
 },
 {
 "id": "luggi-leitner",
@@ -1164,7 +1625,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.moeggers.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz am Lift",
+"lat": 47.5735,
+"lon": 9.82578,
+"d": 150,
+"sz": "mittel",
+"fee": null,
+"lift": ""
+}
+]
 },
 {
 "id": "schneiderkopf",
@@ -1191,6 +1663,17 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/rodelvergnuegen.jpg",
 "c": "3TälerPass / Betreiber"
+}
+],
+"parking": [
+{
+"n": "Parkplatz am Lift",
+"lat": 47.48165,
+"lon": 9.81735,
+"d": 95,
+"sz": "klein",
+"fee": 0,
+"lift": ""
 }
 ]
 },
@@ -1235,7 +1718,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.skilifte-sinswang.de",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Loipenparkplatz",
+"lat": 47.56603,
+"lon": 10.0138,
+"d": 340,
+"sz": "mittel",
+"fee": null,
+"lift": "Übungslift Sinswang"
+}
+]
 },
 {
 "id": "huetten",
@@ -1265,7 +1759,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.bizau.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Hüttenlift",
+"lat": 47.36844,
+"lon": 9.94836,
+"d": 46,
+"sz": "mittel",
+"fee": null,
+"lift": "Hüttenlift"
+}
+]
 },
 {
 "id": "karren",
@@ -1301,7 +1806,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.karren.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Karren 2",
+"lat": 47.40002,
+"lon": 9.75448,
+"d": 86,
+"sz": "groß",
+"fee": 1,
+"lift": "Karrenseilbahn"
+},
+{
+"n": "Parkplatz Karrenseilbahn",
+"lat": 47.40161,
+"lon": 9.75425,
+"d": 135,
+"sz": "klein",
+"fee": null,
+"lift": "Karrenseilbahn"
+},
+{
+"n": "Parkplatz Karrenseilbahn",
+"lat": 47.40303,
+"lon": 9.7513,
+"d": 331,
+"sz": "klein",
+"fee": null,
+"lift": "Karrenseilbahn"
+}
+]
 },
 {
 "id": "gurtis",
@@ -1349,7 +1883,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.schilift-bazora.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Gurtis",
+"lat": 47.19447,
+"lon": 9.64241,
+"d": 108,
+"sz": "mittel",
+"fee": null,
+"lift": "Latzerlift"
+}
+]
 },
 {
 "id": "schuttannen",
@@ -1385,7 +1930,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.sv-hohenems.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Schuttannen Parkplatz",
+"lat": 47.36635,
+"lon": 9.74645,
+"d": 104,
+"sz": "groß",
+"fee": 1,
+"lift": "Schuttannen"
+}
+]
 },
 {
 "id": "dorflift-sulzberg",
@@ -1417,7 +1973,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.dorflift.com",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Sulzberger Dorflift",
+"lat": 47.52419,
+"lon": 9.90575,
+"d": 297,
+"sz": "mittel",
+"fee": null,
+"lift": "Sulzberger Dorflift"
+},
+{
+"n": "Parkplatz Sulzberger Dorflift",
+"lat": 47.5237,
+"lon": 9.90788,
+"d": 170,
+"sz": "klein",
+"fee": null,
+"lift": "Sulzberger Dorflift"
+},
+{
+"n": "Parkplatz Sulzberger Dorflift",
+"lat": 47.52086,
+"lon": 9.9129,
+"d": 369,
+"sz": "klein",
+"fee": null,
+"lift": "Sulzberger Dorflift"
+}
+]
 },
 {
 "id": "baienberg",
@@ -1439,7 +2024,18 @@ window.RESORTS=[
 "mapOnly": true,
 "photos": [],
 "web": "https://www.reuthe.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Skilift Baienberg",
+"lat": 47.37792,
+"lon": 9.89029,
+"d": 441,
+"sz": "klein",
+"fee": null,
+"lift": "Skilift Baienberg"
+}
+]
 },
 {
 "id": "elbigenalp",
@@ -1478,7 +2074,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.knitteltirol.at",
-"webKind": "op"
+"webKind": "op",
+"parking": [
+{
+"n": "Parkplatz Übungslift Knittel I",
+"lat": 47.28537,
+"lon": 10.4253,
+"d": 59,
+"sz": "klein",
+"fee": 0,
+"lift": "Übungslift Knittel I"
+},
+{
+"n": "Parkplatz Übungslift Knittel I",
+"lat": 47.28709,
+"lon": 10.42974,
+"d": 411,
+"sz": "klein",
+"fee": null,
+"lift": "Übungslift Knittel I"
+}
+]
 },
 {
 "id": "stanzach",
@@ -1505,7 +2121,36 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.stanzach.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Stoamandllift",
+"lat": 47.37955,
+"lon": 10.55949,
+"d": 47,
+"sz": "mittel",
+"fee": null,
+"lift": "Stoamandllift"
+},
+{
+"n": "Parkplatz Oberfeldlift II",
+"lat": 47.3748,
+"lon": 10.56883,
+"d": 425,
+"sz": "klein",
+"fee": null,
+"lift": "Oberfeldlift II"
+},
+{
+"n": "Parkplatz Stoamandllift",
+"lat": 47.38414,
+"lon": 10.56091,
+"d": 499,
+"sz": "klein",
+"fee": 1,
+"lift": "Stoamandllift"
+}
+]
 },
 {
 "id": "gramais",
@@ -1532,7 +2177,27 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.lechtal.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Sinesfuierlift",
+"lat": 47.26833,
+"lon": 10.53763,
+"d": 253,
+"sz": "klein",
+"fee": 0,
+"lift": "Sinesfuierlift"
+},
+{
+"n": "Parkplatz Sinesfuierlift",
+"lat": 47.26892,
+"lon": 10.53448,
+"d": 240,
+"sz": "klein",
+"fee": 1,
+"lift": "Sinesfuierlift"
+}
+]
 },
 {
 "id": "boden",
@@ -1559,7 +2224,18 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.lechtal.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": [
+{
+"n": "Parkplatz Anlaglift",
+"lat": 47.28123,
+"lon": 10.60248,
+"d": 420,
+"sz": "mittel",
+"fee": 1,
+"lift": "Anlaglift"
+}
+]
 },
 {
 "id": "haeselgehr",
@@ -1586,6 +2262,7 @@ window.RESORTS=[
 }
 ],
 "web": "https://www.lechtal.at",
-"webKind": "gt"
+"webKind": "gt",
+"parking": []
 }
 ];

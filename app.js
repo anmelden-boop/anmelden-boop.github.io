@@ -22,13 +22,18 @@
   try { S = Object.assign(structuredClone(DEFAULT), JSON.parse(localStorage.getItem(KEY) || '{}')); }
   catch (e) { S = structuredClone(DEFAULT); }
   S.settings = Object.assign({}, DEFAULT.settings, S.settings);
+  if (!['time', 'snow', 'km'].includes(S.sort)) S.sort = 'time';
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Speichern nicht möglich'); } };
 
   /* ---------- 2) Rechnen & Formatieren ---------- */
   const eur = v => (v == null || isNaN(v)) ? '–' : v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
   const hm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')} h`;
-  const drive = r => `${Math.round(r.roadKm)} km · ${hm(r.driveMin)}`;
-  const fuelCost = r => 2 * r.roadKm * S.settings.cons / 100 * S.settings.fuel;
+  // Wohnort: Standard Friedrichshafen (vorberechnet), sonst eigene Fahrzeiten per OSRM
+  const homeOf = () => S.home || { name: CFG.start.name, lat: CFG.start.lat, lon: CFG.start.lon };
+  const roadKm = r => S.home?.t?.[r.id]?.[0] ?? r.roadKm;
+  const driveMin = r => S.home?.t?.[r.id]?.[1] ?? r.driveMin;
+  const drive = r => `${Math.round(roadKm(r))} km · ${hm(driveMin(r))}`;
+  const fuelCost = r => 2 * roadKm(r) * S.settings.cons / 100 * S.settings.fuel;
   const priceOf = r => (S.prices[r.id] != null ? S.prices[r.id] : r.price);
   const panoOf = r => S.pano[r.id] || r.pano;
   const isFav = id => S.favs.includes(id);
@@ -75,18 +80,36 @@
     parts.push([0.20, (panoOf(r) - 1) / 4]);                                                    // Panorama
     parts.push([0.15, Math.log(1 + sizeKm(r)) / Math.log(1 + 90)]);                             // Pistengröße
     const L = lifts[r.id]; if (L && L.total) parts.push([0.10, L.open / L.total]);              // offene Lifte
-    parts.push([0.05, 1 - Math.min(1, r.driveMin / 150)]);                                      // Anfahrt
+    parts.push([0.05, 1 - Math.min(1, driveMin(r) / 150)]);                                      // Anfahrt
     const wsum = parts.reduce((a, p) => a + p[0], 0);
     let sc = parts.reduce((a, p) => a + p[0] * p[1], 0) / wsum;
     if (s.depth != null && s.depth < 15 && fresh < 10) sc *= 0.5; // zu wenig Schnee
     if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
     return sc;
   }
+  const LIFT_KEY = 'dreitaeler-lifts';
+  async function loadLifts() {
+    try {
+      const c = JSON.parse(localStorage.getItem(LIFT_KEY) || 'null');
+      if (c && Date.now() - c.t < 15 * 60 * 1000) { lifts = c.d; return; }
+    } catch (e) { }
+    try {
+      const j = await (await fetch('https://www.3taeler.at/SkigebieteManager/Micado.SkigebieteManager.Plugin.RegionPlugin.RegionApiIO/List.api?region=3taeler')).json();
+      const d = {};
+      (j.items || []).forEach(it => {
+        const L = (it.facilityStatistics || []).find(f => f.identifier === 'lift');
+        const r = R.find(x => x.link && it.pageName && x.link.endsWith(it.pageName));
+        if (L && r && L.count) d[r.id] = { open: L.countOpen, total: L.count };
+      });
+      lifts = d;
+      try { localStorage.setItem(LIFT_KEY, JSON.stringify({ t: Date.now(), d })); } catch (e) { }
+    } catch (e) { /* Liftstatus gerade nicht erreichbar */ }
+  }
   function computePodium() {
     podium = {};
     R.map(r => [r.id, scoreTomorrow(r)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 3).forEach((x, i) => podium[x[0]] = i + 1);
   }
-  const MEDAL = { 1: '#d4a72c', 2: '#a9b1b9', 3: '#b8733a' };
+  const MEDAL = { 1: '#e3a90f', 2: '#8fb3d9', 3: '#b5622a' }; // Gold, Silber (leicht bläulich, damit es sich abhebt), Bronze
   const MEDALNAME = { 1: 'Gold', 2: 'Silber', 3: 'Bronze' };
   const medalDot = id => podium[id] ? `<span class="medal" style="background:${MEDAL[podium[id]]}" title="Tipp für morgen: Platz ${podium[id]}">${podium[id]}</span>` : '';
   const liftsTxt = r => { const L = lifts[r.id]; return L ? `${L.open}/${L.total}` : `–/${r.lifts ?? '–'}`; };
@@ -165,8 +188,8 @@
     attribution: 'Karte: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA), © OpenStreetMap · Schnee: Open-Meteo'
   }).addTo(map);
   let pinsReady = false;
-  const home = CFG.start;
-  L.marker([home.lat, home.lon], { icon: L.divIcon({ className: '', html: '<div class="home-dot"></div>', iconSize: [16, 16] }), interactive: false }).addTo(map);
+  let home = homeOf();
+  const homeMarker = L.marker([home.lat, home.lon], { icon: L.divIcon({ className: '', html: '<div class="home-dot"></div>', iconSize: [16, 16] }), interactive: false }).addTo(map);
   map.fitBounds(L.latLngBounds(R.map(r => [r.lat, r.lon]).concat([[home.lat, home.lon]])), { paddingTopLeft: [20, 70], paddingBottomRight: [20, 170] });
   map.on('zoomend', () => { map.getContainer().classList.toggle('show-labels', map.getZoom() >= 11); if (pinsReady) drawPins(); });
 
@@ -184,8 +207,8 @@
       ${ft > 0 ? `<polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(ft * 100).toFixed(1)} 200"/>` : ''}
       ${sn && (sn.y > 30 || sn.t > 30) ? '<circle cx="0" cy="-30" r="3.2" style="fill:var(--snowY)"/>' : ''}`;
     const fav = isFav(r.id) ? '<polygon points="22,-31 24.4,-26 30,-25.4 25.8,-21.6 27,-16 22,-18.8 17,-16 18.2,-21.6 14,-25.4 19.6,-26" fill="#f2b01e" stroke="#fff" stroke-width="1"/>' : '';
-    return `<svg width="${size}" height="${size}" viewBox="-35 -35 70 70" aria-hidden="true">
-      ${podium[r.id] ? `<polygon points="${hexPts(31)}" fill="none" style="stroke:${MEDAL[podium[r.id]]}" stroke-width="5" stroke-linejoin="round"/>` : ''}
+    return `<svg width="${size}" height="${size}" viewBox="-39 -39 78 78" aria-hidden="true">
+      ${podium[r.id] ? `<polygon points="${hexPts(33)}" fill="none" stroke="#15181b" stroke-width="10.5" stroke-linejoin="round" opacity=".55"/><polygon points="${hexPts(33)}" fill="none" style="stroke:${MEDAL[podium[r.id]]}" stroke-width="8" stroke-linejoin="round"/>${podium[r.id] === 2 ? `<polygon points="${hexPts(33)}" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" opacity=".9"/>` : ''}` : ''}
       <polygon points="${hexPts(30)}" style="fill:var(--card);stroke:${podium[r.id] ? MEDAL[podium[r.id]] : 'var(--ink)'}" stroke-width="1.6" stroke-linejoin="round"/>
       ${bars}
       <polygon points="${hexPts(r.noSki ? 18 : 13)}" fill="${color(r)}"/>
@@ -211,7 +234,7 @@
 
   /* ---------- 5) Liste ---------- */
   const FILTERS = {
-    near: r => r.driveMin <= 60,
+    near: r => driveMin(r) <= 60,
     snow: r => { const s = snow[r.id]; return !!s && ((s.y || 0) + (s.t || 0) >= 3 || (s.m || 0) >= 3); },
     fav: r => isFav(r.id),
     big: r => sizeKm(r) >= 25,
@@ -223,10 +246,10 @@
     const fresh = r => { const s = snow[r.id]; return s ? (s.y || 0) + (s.t || 0) : -1; };
     const st = (r, d) => starsOf(r.id, d) ?? -1;
     return list.slice().sort((a, b) => S.sort === 'snow'
-      ? (fresh(b) - fresh(a)) || ((snow[b.id]?.m || 0) - (snow[a.id]?.m || 0)) || a.driveMin - b.driveMin
-      : S.sort === 'wx'
-        ? (st(b, 0) - st(a, 0)) || (st(b, 1) - st(a, 1)) || a.driveMin - b.driveMin
-        : a.driveMin - b.driveMin);
+      ? (fresh(b) - fresh(a)) || ((snow[b.id]?.m || 0) - (snow[a.id]?.m || 0)) || driveMin(a) - driveMin(b)
+      : S.sort === 'km'
+        ? (sizeKm(b) - sizeKm(a)) || driveMin(a) - driveMin(b)
+        : driveMin(a) - driveMin(b));
   }
   function renderList() {
     const list = sorted(filtered());
@@ -293,13 +316,14 @@
         <button class="iconBtn star ${isFav(id) ? 'on' : ''}" data-act="fav" aria-label="Favorit"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
       </div>
       <div class="metrics num">
-        ${r.noSki ? '' : `<div><span>Lifte offen</span><b>${liftsTxt(r)}</b></div>`}
-        <div><span>Sicht heute</span>${starsHTML(starsOf(id, 0))}</div>
-        <div><span>Sicht morgen</span>${starsHTML(starsOf(id, 1))}</div>
+        <div><span>Fahrtzeit</span><b>${hm(driveMin(r))}</b><small>${Math.round(roadKm(r))} km</small></div>
+        <div><span>Lifte offen</span><b>${r.noSki ? '–' : liftsTxt(r)}</b><small>${lifts[r.id] ? 'live 3Täler' : 'kein Status'}</small></div>
+        <div><span>Sicht heute</span><b>${starsOf(id, 0) != null ? num1(starsOf(id, 0)) : '–'}</b>${starsHTML(starsOf(id, 0))}</div>
+        <div><span>Sicht morgen</span><b>${starsOf(id, 1) != null ? num1(starsOf(id, 1)) : '–'}</b>${starsHTML(starsOf(id, 1))}</div>
       </div>
       ${podium[id] ? `<p class="medalNote"><span class="medal" style="background:${MEDAL[podium[id]]}">${podium[id]}</span> ${MEDALNAME[podium[id]]} – Platz ${podium[id]} der besten Bedingungen für morgen (Wetter, Schnee, Panorama, Größe, Anfahrt)</p>` : ''}
       <div class="gallery">${gallery}</div>
-      <div class="drive num"><b>${drive(r)}</b> ab Friedrichshafen · Sprit hin + zurück <b>${eur(fc)}</b></div>
+      <div class="drive num"><b>${drive(r)}</b> ab ${esc(home.name)} · Sprit hin + zurück <b>${eur(fc)}</b></div>
       ${r.noSki ? '<p class="note">Seilbahn zum Winterwandern – kein Skigebiet, zählt nicht als Skitag.</p>' : `
       <div class="snowGrid num">
         <div class="gd"><b>${cm(s?.y)}</b><span>gestern</span></div>
@@ -318,9 +342,9 @@
         <div><dt>Lifte</dt><dd>${r.lifts ?? '–'}</dd></div>
       </dl>
       ${r.mapOnly ? '<p class="note">Nur auf der 3Täler-Karte gelistet – Pisten/Preis von skiresort.com.</p>' : ''}
+      ${parkHTML(r)}
       <div class="btnGrid">
         <a class="btn" target="_blank" rel="noopener" href="${esc(r.web || r.link)}">${r.web && r.webKind === 'op' ? 'Website Skigebiet ↗' : 'Website (Ort) ↗'}</a>
-        <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/${encodeURIComponent('Parkplatz ' + r.name.replace(/\s*\(.*\)/, ''))}/@${r.lat},${r.lon},14z">Parken (Google Maps) ↗</a>
         <a class="btn" target="_blank" rel="noopener" href="https://maps.apple.com/?saddr=${home.lat},${home.lon}&daddr=${r.lat},${r.lon}&dirflg=d">Route (Apple)</a>
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${r.lat},${r.lon}&travelmode=driving">Route (Google)</a>
         <a class="btn" target="_blank" rel="noopener" href="${esc(r.link)}">Lifte & Pisten ↗</a>
@@ -329,6 +353,17 @@
       ${r.noSki ? '' : checkedToday
         ? `<button class="btn primary done wide" data-act="undoToday">✓ Heute eingecheckt · ${eur(checkedToday.price)}</button>`
         : `<button class="btn primary wide" data-act="checkin">Heute hier einchecken</button>`}`;
+  }
+  function parkHTML(r) {
+    const P = r.parking || [];
+    const gm = (lat, lon) => `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+    if (!P.length) return `<div class="secT">Parken</div><a class="btn wide" target="_blank" rel="noopener" href="https://www.google.com/maps/search/${encodeURIComponent('Parkplatz ' + r.name.replace(/\s*\(.*\)/, ''))}/@${r.lat},${r.lon},15z">Kein Skiparkplatz bekannt – in Google Maps suchen ↗</a>`;
+    return `<div class="secT">Parken <span class="muted small">(nächste Parkplätze an den Liften)</span></div>
+      <ul class="park">${P.map((p, i) => `<li><a target="_blank" rel="noopener" href="${gm(p.lat, p.lon)}">
+        <span class="pIcon">P${P.length > 1 ? i + 1 : ''}</span>
+        <span class="t"><b>${esc(p.n)}</b><span class="muted small">${p.d} m zum Lift${p.lift && !p.n.includes(p.lift) ? ' ' + esc(p.lift) : ''} · ${p.sz}${p.fee === 1 ? ' · kostenpflichtig' : p.fee === 0 ? ' · kostenlos' : ''}</span></span>
+        <span class="go">Maps ↗</span></a></li>`).join('')}</ul>
+      <p class="note">Aus OpenStreetMap: öffentliche Parkplätze nahe den Talstationen, ohne Privat- und Kundenparkplätze.</p>`;
   }
   function wxHTML(r) {
     const w = snow[r.id]?.w;
@@ -393,6 +428,7 @@
       save(); closeModal(); drawPins();
       if (current) renderDetail(current);
       const bal = balance();
+      if (bal.saved >= 0 && bal.saved - pr < 0) celebrate(bal.saved);
       toast(bal.saved >= 0 ? `Eingecheckt · ${eur(bal.saved)} gespart` : `Eingecheckt · noch ${eur(-bal.saved)} bis der Pass sich lohnt`);
     };
   }
@@ -406,6 +442,22 @@
       if (current) renderDetail(current);
       if (!$('#modalWrap').hidden && $('#modal').dataset.kind === 'wallet') openWallet();
     });
+  }
+  // Kleine Animation, wenn der Pass sich gerade gelohnt hat (Bilanz springt über 0 €)
+  function celebrate(saved) {
+    const box = document.createElement('div'); box.className = 'party'; box.setAttribute('role', 'status');
+    const cols = ['#e3a90f', '#5a9e2a', '#2f7fd8', '#e0483e', '#ef9f27', '#8fb3d9'];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let bits = '';
+    if (!reduce) for (let i = 0; i < 70; i++) {
+      const x = Math.random() * 100, dx = (Math.random() - .5) * 60, rot = Math.random() * 720, del = Math.random() * .4, dur = 1.6 + Math.random() * 1.2;
+      bits += `<i style="left:${x}%;background:${cols[i % cols.length]};--dx:${dx}vw;--rot:${rot}deg;animation-delay:${del}s;animation-duration:${dur}s"></i>`;
+    }
+    box.innerHTML = bits + `<div class="partyCard"><div class="partyBig">🎉</div><b>Der Pass hat sich gelohnt!</b><span class="num">+${eur(saved)} gespart</span></div>`;
+    document.body.appendChild(box);
+    if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+    box.onclick = () => box.remove();
+    setTimeout(() => box.remove(), 3800);
   }
   function balance() {
     const value = S.checkins.reduce((a, c) => a + c.price, 0);
@@ -432,6 +484,8 @@
         : '<li class="muted">Noch keine Skitage. Öffne ein Gebiet und tippe „Heute hier einchecken“.</li>'}</ul>
       <details><summary>Einstellungen</summary>
         <div class="form">
+          <button class="btn" id="setTour">Einführung nochmal ansehen</button>
+          <button class="btn" id="setHome">Wohnort: ${esc(homeOf().name)} – ändern</button>
           <label>Passpreis (€) <input type="number" id="setPass" inputmode="decimal" step="1" value="${pass}"></label>
           <label>Verbrauch (l/100 km) <input type="number" id="setCons" inputmode="decimal" step="0.1" value="${S.settings.cons}"></label>
           <label>Benzinpreis (€/l) <input type="number" id="setFuel" inputmode="decimal" step="0.01" value="${S.settings.fuel}"></label>
@@ -447,6 +501,8 @@
       </details>`, 'wallet');
     $('#modal').querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => removeCheckin(S.checkins[+btn.dataset.del]));
     const num = (el, key) => el.onchange = () => { const v = parseFloat(String(el.value).replace(',', '.')); if (!isNaN(v) && v >= 0) { S.settings[key] = v; save(); renderList(); if (current) renderDetail(current); openWallet(); } };
+    $('#setHome').onclick = () => openHome(false);
+    $('#setTour').onclick = () => openTour();
     num($('#setPass'), 'pass'); num($('#setCons'), 'cons'); num($('#setFuel'), 'fuel');
     $('#fuelLive').onclick = async () => {
       $('#fuelLive').textContent = 'Lade …';
@@ -490,7 +546,7 @@
     $('#dGo').onclick = () => {
       const opt = { fav: $('#dFav').checked, snow: $('#dSnow').checked, big: $('#dBig').checked, max: $('#dMax').value };
       localStorage.setItem('dreitaeler-dice', JSON.stringify(opt));
-      const pool = R.filter(r => !r.noSki && (!opt.fav || isFav(r.id)) && (!opt.snow || FILTERS.snow(r)) && (!opt.big || sizeKm(r) >= 8) && (opt.max === '0' || r.driveMin <= +opt.max));
+      const pool = R.filter(r => !r.noSki && (!opt.fav || isFav(r.id)) && (!opt.snow || FILTERS.snow(r)) && (!opt.big || sizeKm(r) >= 8) && (opt.max === '0' || driveMin(r) <= +opt.max));
       if (!pool.length) { $('#dRes').innerHTML = '<span class="muted">Kein Gebiet passt zu diesen Bedingungen.</span>'; return; }
       const pick = pool[Math.floor(Math.random() * pool.length)];
       let n = 0;
@@ -513,6 +569,76 @@
 
   /* ---------- 9) Bedienung ---------- */
   // Dialoge
+  function openHome(first) {
+    const h = homeOf();
+    modal(`
+      <div class="mHead"><div class="h2">${first ? 'Wo startest du?' : 'Wohnort ändern'}</div>${first ? '' : '<button class="iconBtn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'}</div>
+      <p class="muted small" style="margin:0 0 10px">Von hier berechnet die App Fahrtzeit, Strecke und Spritkosten zu allen Gebieten.</p>
+      <div class="form"><label>Ort <input id="hmQ" style="width:62%" type="search" autocomplete="off" value="${esc(h.name)}" placeholder="z. B. Dornbirn"></label></div>
+      <button class="btn primary wide" id="hmGo">Ort suchen</button>
+      <ul class="cList" id="hmRes"></ul>
+      <p class="note" id="hmMsg"></p>`, 'home');
+    const pick = async (name, lat, lon) => {
+      $('#hmMsg').textContent = 'Berechne Fahrtzeiten …';
+      try {
+        if (name === CFG.start.name && Math.abs(lat - CFG.start.lat) < 0.02 && Math.abs(lon - CFG.start.lon) < 0.02) {
+          S.home = { name, lat: CFG.start.lat, lon: CFG.start.lon, t: null };
+        } else {
+          const pts = [[lon, lat]].concat(R.map(r => [r.lon, r.lat])).map(p => p.map(v => v.toFixed(5)).join(',')).join(';');
+          const j = await (await fetch(`https://router.project-osrm.org/table/v1/driving/${pts}?sources=0&annotations=duration,distance`)).json();
+          if (j.code !== 'Ok') throw new Error(j.code);
+          const t = {};
+          R.forEach((r, i) => { const du = j.durations[0][i + 1], di = j.distances[0][i + 1]; if (du != null && di != null) t[r.id] = [Math.round(di / 100) / 10, Math.round(du / 60)]; });
+          S.home = { name, lat, lon, t };
+        }
+        save(); home = homeOf(); homeMarker.setLatLng([home.lat, home.lon]);
+        closeModal(); drawPins(); renderList(); computePodium(); if (current) renderDetail(current);
+        if (first && !S.toured) openTour(); else toast(`Fahrtzeiten ab ${name}`);
+      } catch (e) { $('#hmMsg').textContent = 'Routenberechnung gerade nicht erreichbar – bitte später nochmal.'; }
+    };
+    $('#hmGo').onclick = async () => {
+      const q = $('#hmQ').value.trim(); if (!q) return;
+      $('#hmMsg').textContent = 'Suche …';
+      try {
+        const j = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=de`)).json();
+        const res = (j.results || []).filter(x => ['DE', 'AT', 'CH', 'LI', 'IT', 'FR'].includes(x.country_code));
+        $('#hmMsg').textContent = res.length ? 'Bitte auswählen:' : 'Nichts gefunden – anders schreiben?';
+        $('#hmRes').innerHTML = res.map((x, i) => `<li><button class="btn wide" data-i="${i}">${esc(x.name)}<span class="muted small">&nbsp;· ${esc([x.admin1, x.country].filter(Boolean).join(', '))}</span></button></li>`).join('');
+        $('#hmRes').querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const x = res[+b.dataset.i]; pick(x.name, x.latitude, x.longitude); });
+      } catch (e) { $('#hmMsg').textContent = 'Ortssuche gerade nicht erreichbar.'; }
+    };
+    $('#hmQ').onkeydown = e => { if (e.key === 'Enter') $('#hmGo').click(); };
+  }
+  // Kurze Einführung beim ersten Öffnen (zum Durchklicken, ca. 1 Minute)
+  function openTour(start) {
+    const pin = (fill, y, t, ring) => `<svg width="64" height="64" viewBox="-39 -39 78 78" aria-hidden="true">${ring ? `<polygon points="${hexPts(33)}" fill="none" stroke="${ring}" stroke-width="8" stroke-linejoin="round"/>` : ''}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/><polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${y} 200"/><polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${t} 200"/><polygon points="${hexPts(13)}" fill="${fill}"/></svg>`;
+    const steps = [
+      ['Willkommen 👋', `<p>Die Karte zeigt alle <b>38 Gebiete</b> deines 3TälerPass. Unten ist die <b>Liste</b> – nach oben ziehen zum Aufklappen.</p><p><b>Pin oder Listeneintrag antippen</b> öffnet das Gebiet mit Fotos, Webcams, Wetter und Parkplätzen.</p>`],
+      ['So liest du einen Pin', `<div class="tPin">${pin('#2f7fd8', 40, 80)}<div><p><b>Links schwarz:</b> Neuschnee gestern<br><b>Rechts grün:</b> Neuschnee heute<br>Voller Balken = 30 cm</p></div></div><p class="tLeg"><span style="background:#2f7fd8"></span>groß ≥ 25 km <span style="background:#ef9f27"></span>mittel <span style="background:#e0483e"></span>klein &lt; 8 km <span style="background:#9a9a9a"></span>Karren</p><p class="muted small">Farbe innen = Größe des Gebiets.</p>`],
+      ['Gold, Silber, Bronze', `<div class="tPin">${pin('#2f7fd8', 30, 60, MEDAL[1])}${pin('#ef9f27', 20, 40, MEDAL[2])}${pin('#2f7fd8', 10, 50, MEDAL[3])}</div><p>Die drei Gebiete mit den <b>besten Bedingungen für morgen</b> bekommen einen farbigen Rahmen – aus Wetter, Schnee, Panorama, Pistengröße, offenen Liften und (wenig) Anfahrt.</p>`],
+      ['Ein Gebiet im Detail', `<p>Oben vier Kacheln: <b>Fahrtzeit</b> ab deinem Wohnort, <b>offene Lifte</b> (live von 3Täler) und die <b>Sicht</b> heute und morgen in Sternen – 5 Sterne heißt Sonne ohne Wolken.</p><p>Darunter Wetter für 7 Tage, <b>Parkplätze</b> mit Link zu Google Maps und die Website des Gebiets.</p>`],
+      ['Einchecken lohnt sich', `<p>Tippe im Gebiet auf <b>„Heute hier einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
+      ['Filtern & Würfeln', `<p>Oben die <b>Filter</b>: ≤ 1 h Fahrt, Neuschnee, Favoriten, große Gebiete und gute Sicht heute oder morgen – kombinierbar.</p><p>Die Liste sortierst du nach <b>Fahrtzeit, Neuschnee oder Pisten-km</b>. Der <b>Würfel</b> lost ein Gebiet aus.</p>`],
+      ['Deine Daten', `<p>Favoriten, Skitage und Einstellungen liegen <b>nur auf diesem Gerät</b> – kein Konto, nichts wird hochgeladen.</p><p>Tipp: Über Teilen → <b>„Zum Home-Bildschirm“</b> als App speichern und ab und zu in der Bilanz eine <b>Sicherung</b> machen.</p>`]
+    ];
+    let i = start || 0;
+    const show = () => {
+      const [h, body] = steps[i];
+      modal(`<div class="tour">
+        <div class="mHead"><div class="h2">${h}</div><button class="iconBtn" data-tour="skip" aria-label="Einführung schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+        <div class="tBody">${body}</div>
+        <div class="tDots">${steps.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+        <div class="btnGrid">${i ? '<button class="btn" data-tour="back">Zurück</button>' : '<button class="btn" data-tour="skip">Überspringen</button>'}<button class="btn primary" data-tour="next">${i === steps.length - 1 ? 'Los geht’s' : 'Weiter'}</button></div></div>`, 'tour');
+      $('#modal').querySelectorAll('[data-tour]').forEach(b => b.onclick = e => {
+        e.stopPropagation();
+        const a = b.dataset.tour;
+        if (a === 'next' && i < steps.length - 1) { i++; show(); return; }
+        if (a === 'back') { i--; show(); return; }
+        S.toured = true; save(); closeModal();
+      });
+    };
+    show();
+  }
   function modal(html, kind) { $('#modal').innerHTML = html; $('#modal').dataset.kind = kind || ''; $('#modalWrap').hidden = false; }
   function closeModal() { $('#modalWrap').hidden = true; $('#modal').innerHTML = ''; }
   $('#modalWrap').addEventListener('click', e => { if (e.target.id === 'modalWrap' || e.target.closest('[data-close]')) closeModal(); });
@@ -627,6 +753,8 @@
   drawPins();
   renderList();
   setSheet('peek');
-  loadSnow();
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) loadSnow(); });
+  const refresh = () => loadLifts().then(() => loadSnow());
+  refresh();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  if (!S.home) openHome(true);
 })();
