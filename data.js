@@ -59,7 +59,37 @@ window.RESORTS=[
 "u": "https://livecam.jaegeralpe.at/jaegeralpe2.jpg"
 }
 ],
-"pano": 5
+"pano": 5,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/auenfeld-freerider-sl-schrcken-385.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/warth15-alexkaiser.at-2108.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/warth15-alexkaiser.at-2403.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/72665-warth-12-03-2020-action-fs-christian-riefenberg-qparks-12.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/auenfeld-martinmcflywinkler-jrohn-20171229-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/salober-snowboarden-0667-big.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/salober-tal-skifahrer-familie-sl-schrcken-196.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "damuels-mellau",
@@ -87,7 +117,41 @@ window.RESORTS=[
 }
 ],
 "pano": 4,
-"camLink": "https://hertehof.webcam-livestream.at/"
+"camLink": "https://hertehof.webcam-livestream.at/",
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/damuels-panorama1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/skitour-4.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/skifahrer-c-sepp-mallaun-vorarlberg-tourismus.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/6-sb-oberdamuels.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/paralellslalom-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/rodeln-3.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/snowpark-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/snowpark-damuels-18.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "diedamskopf",
@@ -126,7 +190,49 @@ window.RESORTS=[
 "u": "https://www1.camynocloud.at/diedamskopf/pictures/wedelstube.jpg"
 }
 ],
-"pano": 5
+"pano": 5,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/66525-diedamskopf-09-02-2020-action-fs-unknown-rider-christian-riefenberg-qparks-35.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/diedamskopfwinter-alexkaiser-17.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/diedamskopfwinter-alexkaiser-45.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/diedamskopfwinter-alexkaiser-106.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/diedamskopfwinter-alexkaiser-67.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/berbahnen-diedamskopf-diedamspark-skigebiet-shred-poker-christian-riefenberg-3.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/berbahnen-diedamskopf-diedamspark-skigebiet-shred-poker-christian-riefenberg-4.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/diedamskopfwinter-alexkaiser-82.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/66539-diedamskopf-09-02-2020-action-fs-unknown-rider-christian-riefenberg-qparks-48.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/66555-diedamskopf-09-02-2020-action-fs-unknown-rider-christian-riefenberg-qparks-62.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "sonnenkopf",
@@ -149,7 +255,33 @@ window.RESORTS=[
 "u": "https://wtvthmb.feratel.com/thumbnails/5800.jpeg?t=38&design=v5&dcsdesign=WTP_partner"
 }
 ],
-"pano": 4
+"pano": 4,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/sonnenkopf-17.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/sonnenkopf-20.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/sonnenkopfwinter-182.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/sonnenkopfwinter-112.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/sonnenkopf-7.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/sk2-172.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "faschina",
@@ -180,7 +312,25 @@ window.RESORTS=[
 "u": "https://livecam.seilbahnenfaschina.konzett.info/cam4.jpg"
 }
 ],
-"pano": 4
+"pano": 4,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/schneereich-faschina002-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/schneereich-faschina003.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/schneereich-faschina004.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/schneereich-faschina008.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "balderschwang",
@@ -198,7 +348,37 @@ window.RESORTS=[
 "roadKm": 73.7,
 "driveMin": 73,
 "cams": [],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/drohne-skigebiet-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/drohne-skigebiet-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/lifttrasse-6er-sessel-verschneit.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/schlepplft.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/blick-auf-kaesehuette-verschneit.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/snowtubing.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/women-high-five.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "laterns",
@@ -221,7 +401,29 @@ window.RESORTS=[
 "u": "https://wtvthmb.feratel.com/thumbnails/5002.jpeg?t=38&design=v5&dcsdesign=WTP_partner"
 }
 ],
-"pano": 4
+"pano": 4,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/laterns-skigebiet-bilder-27012016565.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/animation/laterns-skigebiet.webp",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/laterns-veranstaltungen-vorarlberg-2301201559.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/laterns-rodelbahn-vorarlberg-2201201530.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/4er.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "boedele",
@@ -240,7 +442,45 @@ window.RESORTS=[
 "driveMin": 54,
 "cams": [],
 "pano": 3,
-"camLink": "https://lanklift.webcam-livestream.at/"
+"camLink": "https://lanklift.webcam-livestream.at/",
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-1477.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-4855-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/hochaelpelecopyrightaloismetzler013-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/hochaelpelecopyrightaloismetzler011.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-4707.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-4710.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-4721-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc-4723-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20170218-boedele014cjuergenkostelactarifgemeinschaftboedele.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "steibis",
@@ -267,7 +507,25 @@ window.RESORTS=[
 "u": "https://www.huendle-imberg.de/webcam/fluhexpress.jpg"
 }
 ],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/i-winter-13.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/i-winter-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/i-winter-5.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/i-winter-10.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "huendle",
@@ -290,7 +548,21 @@ window.RESORTS=[
 "u": "https://www.huendle-imberg.de/webcam/huendleberg.jpg"
 }
 ],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/2021-01-18.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/2021-01-25.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/2021-01-11.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "schetteregg",
@@ -317,7 +589,37 @@ window.RESORTS=[
 "u": "https://www.schetteregg.at/webcam/cam2/cam2.jpg"
 }
 ],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/dji-0377.e.s.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bg9i7892.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dji-0379.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bg9i8079.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bg9i8151.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bg9i8367.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bg9i7628.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "hochhaederich",
@@ -335,7 +637,29 @@ window.RESORTS=[
 "roadKm": 64.3,
 "driveMin": 61,
 "cams": [],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/20130123-0494.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20130123-0161.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20130123-0524.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20130123-1052.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20130123-1073.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "hochgrat",
@@ -358,7 +682,37 @@ window.RESORTS=[
 "u": "https://wtvthmb.feratel.com/thumbnails/3055.jpeg?t=38&design=v5&dcsdesign=WTP_partner"
 }
 ],
-"pano": 5
+"pano": 5,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/1024130-hochgrat-rodeln-2018-jmw.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/1024265-hochgrat-rodeln-2018-jmw.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/img-6370.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/img-6374.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/1024290-hochgrat-rodeln-2018-jmw.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/1024384-hochgrat-rodeln-2018-jmw.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/winter-sonnenuntergang-9.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "sonntag",
@@ -377,7 +731,13 @@ window.RESORTS=[
 "driveMin": 77,
 "cams": [],
 "pano": 4,
-"camLink": "https://sonntag-stein.webcam-livestream.at/"
+"camLink": "https://sonntag-stein.webcam-livestream.at/",
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/12011405.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "raggal",
@@ -395,7 +755,29 @@ window.RESORTS=[
 "roadKm": 88.7,
 "driveMin": 70,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/raggal001-kopie.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/raggal003.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/raggal005.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/raggal002.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/raggal004.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "joechelspitze",
@@ -413,7 +795,21 @@ window.RESORTS=[
 "roadKm": 124,
 "driveMin": 127,
 "cams": [],
-"pano": 4
+"pano": 4,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/lechtal-alexkaiser-.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/lechtal-alexkaiser-1598.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/lechtal-alexkaiser-1044.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "niedere",
@@ -436,7 +832,37 @@ window.RESORTS=[
 "u": "https://www.foto-webcam.eu/webcam/andelsbuch/current/640.jpg"
 }
 ],
-"pano": 4
+"pano": 4,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-9.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-8.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-4.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-5.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-6.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-7.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-2.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "hochlitten",
@@ -459,7 +885,29 @@ window.RESORTS=[
 "u": "https://www.skilifte-hochlitten.com/fileadmin/webcam/live.jpg"
 }
 ],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/hochlitten-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/hochlitten11.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/hochlitten12.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/beschneiung.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/hochlitten-.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "alberschwende",
@@ -477,7 +925,13 @@ window.RESORTS=[
 "roadKm": 50.3,
 "driveMin": 44,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/20210121-145318-1.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "groellerkopf",
@@ -495,7 +949,17 @@ window.RESORTS=[
 "roadKm": 70.3,
 "driveMin": 57,
 "cams": [],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc04068.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/img-20160118-144834.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "heumoeser",
@@ -513,7 +977,13 @@ window.RESORTS=[
 "roadKm": 59.4,
 "driveMin": 62,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/ebnitwintercdornbirnerseilbahnag.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "holzgau",
@@ -531,7 +1001,17 @@ window.RESORTS=[
 "roadKm": 116.1,
 "driveMin": 115,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://www.lechtaler-bergbahnen.at/media/animation/lechtal-alexkaiser--2.jpg",
+"c": "Lechtaler Bergbahnen"
+},
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/lift.webp",
+"c": "Lechtal Tourismus"
+}
+]
 },
 {
 "id": "hittisberg",
@@ -554,7 +1034,17 @@ window.RESORTS=[
 "u": "https://cam.hittisau.at/aktuell.jpg"
 }
 ],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/img-2881.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/img-8795.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "kraehenberg",
@@ -572,7 +1062,29 @@ window.RESORTS=[
 "roadKm": 70.5,
 "driveMin": 71,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc01677.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/20190115-141244.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc01684.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc01680.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/dsc08374.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "luggi-leitner",
@@ -590,7 +1102,21 @@ window.RESORTS=[
 "roadKm": 35.2,
 "driveMin": 34,
 "cams": [],
-"pano": 3
+"pano": 3,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/luggi-leitner-lift-1.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/kinderland-luggi-leitner-lift.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/luggi-leitner-lift-4.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "schneiderkopf",
@@ -608,7 +1134,17 @@ window.RESORTS=[
 "roadKm": 44.4,
 "driveMin": 42,
 "cams": [],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/blick-auf-den-uebungshang.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/rodelvergnuegen.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "sinswang",
@@ -635,7 +1171,21 @@ window.RESORTS=[
 "u": "https://www.skilifte-sinswang.de/webcam-data/webcam.jpg"
 }
 ],
-"pano": 2
+"pano": 2,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/2015-01-02-skischule-sinswang-42.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/bild-startseite-2.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/kleines-bild-kinderkurs3.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "huetten",
@@ -653,7 +1203,17 @@ window.RESORTS=[
 "roadKm": 70.7,
 "driveMin": 72,
 "cams": [],
-"pano": 1
+"pano": 1,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/img-20210215-wa0032.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/img-0608.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "karren",
@@ -677,7 +1237,17 @@ window.RESORTS=[
 }
 ],
 "pano": 4,
-"noSki": true
+"noSki": true,
+"photos": [
+{
+"u": "https://ski.3taeler.at/media/gallery/csm-karrenstaufenimwinter-c-matthiasrhombergdornbirnerseilbahnag-001-0620772371.jpg",
+"c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://ski.3taeler.at/media/gallery/karren-winter-c-dsg-03.jpg",
+"c": "3TälerPass / Betreiber"
+}
+]
 },
 {
 "id": "gurtis",
@@ -709,7 +1279,21 @@ window.RESORTS=[
 }
 ],
 "pano": 3,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://cdn.prod.website-files.com/5fcf7561abc0a207e90d52fe/5feb6f453baa0a04208b3d26_FINE9889-p-1600.jpeg",
+"c": "Skilifte Gurtis"
+},
+{
+"u": "https://cdn.prod.website-files.com/5fcf7561abc0a207e90d52fe/600093d0d1200dc426cef20f_FINE9842_square-p-1600.jpeg",
+"c": "Skilifte Gurtis"
+},
+{
+"u": "https://cdn.prod.website-files.com/5fcf7561abc0a207e90d52fe/5fd27620052d1b1e85c96122_93052D81-C492-4198-A851-1EB430478796-p-1600.jpeg",
+"c": "Skilifte Gurtis"
+}
+]
 },
 {
 "id": "schuttannen",
@@ -733,7 +1317,17 @@ window.RESORTS=[
 }
 ],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://www.bodensee-vorarlberg.com/uploads/media/750x620/08/22528-Skiverein-Hohenems-Schuttannen.jpg",
+"c": "Bodensee-Vorarlberg Tourismus / SV Hohenems"
+},
+{
+"u": "https://www.bodensee-vorarlberg.com/uploads/media/930x560/00/22530-Skiverein-Hohenems-Schuttannen.jpg",
+"c": "Bodensee-Vorarlberg Tourismus / SV Hohenems"
+}
+]
 },
 {
 "id": "dorflift-sulzberg",
@@ -757,7 +1351,13 @@ window.RESORTS=[
 }
 ],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://www.dorflift.com/images/Dorflift_Kirmair.jpg",
+"c": "Dorflift Sulzberg"
+}
+]
 },
 {
 "id": "baienberg",
@@ -776,7 +1376,8 @@ window.RESORTS=[
 "driveMin": 65,
 "cams": [],
 "pano": 1,
-"mapOnly": true
+"mapOnly": true,
+"photos": []
 },
 {
 "id": "elbigenalp",
@@ -795,7 +1396,25 @@ window.RESORTS=[
 "driveMin": 125,
 "cams": [],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://www.knitteltirol.at/assets/images/s/skihang-bbqxac02v5g36kf.jpg",
+"c": "Knittel Tirol"
+},
+{
+"u": "https://www.knitteltirol.at/assets/images/v/IMG_5677-zn8gyasvt9qdvgc.jpg",
+"c": "Knittel Tirol"
+},
+{
+"u": "https://www.knitteltirol.at/assets/images/z/winter-xye9fsnqkp0r986.jpg",
+"c": "Knittel Tirol"
+},
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/skilift.webp",
+"c": "Lechtal Tourismus"
+}
+]
 },
 {
 "id": "stanzach",
@@ -814,7 +1433,13 @@ window.RESORTS=[
 "driveMin": 125,
 "cams": [],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/familienskilift-stanzach.webp",
+"c": "Lechtal Tourismus"
+}
+]
 },
 {
 "id": "gramais",
@@ -833,7 +1458,13 @@ window.RESORTS=[
 "driveMin": 162,
 "cams": [],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/uebungslift-gramais.webp",
+"c": "Lechtal Tourismus"
+}
+]
 },
 {
 "id": "boden",
@@ -852,7 +1483,13 @@ window.RESORTS=[
 "driveMin": 141,
 "cams": [],
 "pano": 2,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/skifahren-boden.webp",
+"c": "Lechtal Tourismus"
+}
+]
 },
 {
 "id": "haeselgehr",
@@ -871,6 +1508,12 @@ window.RESORTS=[
 "driveMin": 136,
 "cams": [],
 "pano": 1,
-"mapOnly": true
+"mapOnly": true,
+"photos": [
+{
+"u": "https://tourism.lechtal.at/media/infrastructure/teaser/lift-1.webp",
+"c": "Lechtal Tourismus"
+}
+]
 }
 ];

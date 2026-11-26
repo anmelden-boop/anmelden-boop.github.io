@@ -159,7 +159,6 @@
 
   /* ---------- 6) Detailansicht ---------- */
   let current = null;
-  const wikiCache = {};
   function openDetail(id, fly) {
     current = id;
     const r = byId[id];
@@ -174,7 +173,6 @@
       p.y += sheetVisible() / 2 - 20; // Pin über dem Blatt anzeigen
       map.flyTo(map.unproject(p, z), z, { duration: .6 });
     }
-    loadWiki(r);
   }
   function closeDetail() {
     current = null;
@@ -185,10 +183,14 @@
   const mtn = on => `<svg viewBox="0 0 30 22"><path d="M1 21 L11 5 L16 12 L20 7 L29 21 Z" style="fill:${on ? 'var(--ink)' : 'none'};stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round" opacity="${on ? 1 : .35}"/>${on ? '<path d="M8.6 9 L11 5 L13.4 9 L11.8 8 L11 9.2 L10.2 8 Z" style="fill:var(--card)"/>' : ''}</svg>`;
   function renderDetail(id) {
     const r = byId[id], s = snow[id], pano = panoOf(r);
+    // Reihenfolge: 1) Titelbild (Panorama/Piste, Betreiber) 2) Live-Webcams 3) weitere Schneebilder
+    const photo = (p, first) => `<div class="gItem"><img ${first ? 'fetchpriority="high"' : 'loading="lazy"'} alt="${esc(r.name)}" src="${esc(p.u)}" onerror="this.parentNode.remove()"><span class="cap">Foto: ${esc(p.c)}</span></div>`;
+    const ph = r.photos || [];
+    const hero = ph.length ? photo(ph[0], true) : '';
     const cams = r.cams.map(c => `<div class="gItem"><img loading="lazy" alt="Webcam ${esc(c.t)}" src="${esc(c.u + (c.u.includes('?') ? '&' : '?') + '_=' + Math.floor(Date.now() / 6e5))}" onerror="this.parentNode.classList.add('noimg');this.parentNode.innerHTML='Webcam ${esc(c.t)} gerade nicht verfügbar'"><span class="cap"><span class="live"></span>Webcam · ${esc(c.t)}</span></div>`).join('');
     const camLink = r.camLink ? `<a class="gItem noimg" href="${esc(r.camLink)}" target="_blank" rel="noopener">Live-Webcam öffnen ↗</a>` : '';
-    const wiki = (wikiCache[id] || []).map(w => `<div class="gItem"><img loading="lazy" alt="${esc(w.title)}" src="${esc(w.thumb)}"><span class="cap">Foto: <a href="${esc(w.page)}" target="_blank" rel="noopener">${esc(w.artist)}</a> · ${esc(w.lic)}</span></div>`).join('');
-    const gallery = cams + camLink + wiki || `<div class="gItem noimg">${wikiCache[id] ? 'Keine Bilder gefunden' : 'Bilder werden geladen …'}</div>`;
+    const more = ph.slice(1).map(p => photo(p, false)).join('');
+    const gallery = hero + cams + camLink + more || `<div class="gItem noimg">Kein offizielles Schneebild verfügbar – Infos über „Lifte & Pisten“.</div>`;
     const checkedToday = S.checkins.find(c => c.date === today() && c.id === id);
     const fc = fuelCost(r);
     const p = priceOf(r);
@@ -251,22 +253,6 @@
     }
   });
 
-  // Freie Fotos von Wikimedia Commons rund um das Gebiet
-  async function loadWiki(r) {
-    if (wikiCache[r.id]) return;
-    try {
-      const u = 'https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=' + r.lat + '%7C' + r.lon +
-        '&ggsradius=6000&ggsnamespace=6&ggslimit=20&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=900&format=json&origin=*';
-      const j = await (await fetch(u)).json();
-      const strip = h => { const d = document.createElement('div'); d.innerHTML = h || ''; return d.textContent.trim(); };
-      const pages = Object.values(j.query?.pages || {}).filter(p => /\.(jpe?g)$/i.test(p.title) && p.imageinfo?.[0]?.thumburl);
-      wikiCache[r.id] = pages.slice(0, 8).map(p => {
-        const ii = p.imageinfo[0], m = ii.extmetadata || {};
-        return { title: p.title.replace(/^File:/, ''), thumb: ii.thumburl, page: ii.descriptionurl, artist: strip(m.Artist?.value).slice(0, 40) || 'Wikimedia', lic: strip(m.LicenseShortName?.value) || 'freie Lizenz' };
-      });
-    } catch (e) { wikiCache[r.id] = []; }
-    if (current === r.id) renderDetail(r.id);
-  }
 
   /* ---------- 7) Check-in & Bilanz ---------- */
   function openCheckin(id, date) {
@@ -410,7 +396,7 @@
       const s = snow[r.id];
       $('#dRes').innerHTML = `<div class="rn">${esc(r.name)}</div>
         <div class="num">${drive(r)} · Sprit ${eur(fuelCost(r))}</div>
-        <div class="muted small num">${s ? `Neuschnee gestern ${cm(s.y)} · morgen ${cm(s.m)}` : ''} · Panorama ${panoOf(r)}/5</div>
+        <div class="muted small num">${s ? `Neuschnee gestern ${cm(s.y)} · heute ${cm(s.t)}` : ''} · Panorama ${panoOf(r)}/5</div>
         <button class="btn" style="margin-top:8px" id="dShow">Anzeigen</button>`;
       $('#dShow').onclick = () => { closeModal(); openDetail(r.id, true); };
     }
