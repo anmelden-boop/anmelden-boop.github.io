@@ -23,7 +23,7 @@
   catch (e) { S = structuredClone(DEFAULT); }
   S.settings = Object.assign({}, DEFAULT.settings, S.settings);
   if (!['time', 'snow', 'km'].includes(S.sort)) S.sort = 'time';
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Speichern nicht möglich'); } };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Speichern nicht möglich'); } if (typeof passBtn === 'function') passBtn(); };
 
   /* ---------- 2) Rechnen & Formatieren ---------- */
   const eur = v => (v == null || isNaN(v)) ? '–' : v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' });
@@ -87,14 +87,28 @@
     if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
     return sc;
   }
-  // Alle Online-Daten werden 1 Stunde auf dem Gerät zwischengespeichert – weniger Abrufe, kein manuelles Neuladen
-  const CACHE_MS = 60 * 60 * 1000;
+  /* Abruf-Intervalle: jede Quelle nur so oft wie nötig, nie öfter als alle 30 Minuten (kein manuelles Neuladen).
+     - Sicht/Wetter HEUTE (kleiner Abruf):  stündlich, aber nur 7–16 Uhr – danach ist der Skitag vorbei
+     - Prognose (morgen, 7 Tage, Neuschnee, Schneehöhe): alle 3 h + einmal frisch ab 6 Uhr – die Modelle rechnen nur alle 3–6 h neu
+     - Lifte offen + Öffnungsstatus (3Täler): alle 4 h, zusätzlich einmal frisch nach 8 Uhr (Betriebsbeginn)
+     - Spritpreis: höchstens alle 12 h (nur auf Knopfdruck)
+     - Fahrtzeiten: nur wenn sich der Wohnort ändert */
+  const MIN = 60 * 1000, HOUR = 60 * MIN, FLOOR = 30 * MIN;
+  const atToday = h => { const d = new Date(); d.setHours(h, 0, 0, 0); return d.getTime(); };
+  const stale = (t, maxAge, freshAfterHour) => {
+    const age = Date.now() - (t || 0);
+    if (age < FLOOR) return false;
+    if (age >= maxAge) return true;
+    return freshAfterHour != null && Date.now() >= atToday(freshAfterHour) && t < atToday(freshAfterHour);
+  };
+  const TTL = { today: HOUR, long: 3 * HOUR, lifts: 4 * HOUR, fuel: 12 * HOUR };
   const LIFT_KEY = 'dreitaeler-lifts';
   let liftsT = 0;
   async function loadLifts() {
     try {
       const c = JSON.parse(localStorage.getItem(LIFT_KEY) || 'null');
-      if (c && Date.now() - c.t < CACHE_MS) { lifts = c.d; liftsT = c.t; return; }
+      if (c) { lifts = c.d; liftsT = c.t; }
+      if (c && !stale(c.t, TTL.lifts, 8)) return;
     } catch (e) { }
     try {
       const j = await (await fetch('https://www.3taeler.at/SkigebieteManager/Micado.SkigebieteManager.Plugin.RegionPlugin.RegionApiIO/List.api?region=3taeler')).json();
@@ -142,10 +156,38 @@
     if (!(cloud < 15 && sunFrac > 0.7)) st = Math.min(st, 4.5);
     return Math.max(0.5, Math.min(5, st));
   }
+  const TODAY_KEY = 'dreitaeler-wxT';
+  let snowT = 0, todayT = 0, todayD = null;
+  // Tageswerte aus dem kleinen Heute-Abruf über die Prognose legen (nur wenn vom selben Tag)
+  function applyToday() {
+    if (!todayD || todayT <= snowT || todayD.date !== snow[R[0].id]?.w?.[0]?.date) return; // nur wenn neuer als die Prognose
+    R.forEach(r => { const o = todayD.d[r.id], s = snow[r.id]; if (o && s) { Object.assign(s.w[0], o.w); if (o.t != null) s.t = o.t; } });
+  }
+  async function loadToday() {
+    try { const c = JSON.parse(localStorage.getItem(TODAY_KEY) || 'null'); if (c) { todayD = c.v; todayT = c.t; } } catch (e) { }
+    const h = new Date().getHours();
+    if (h < 7 || h >= 16 || !stale(todayT, TTL.today) || !stale(snowT, TTL.today)) return; // außerhalb der Skizeit oder frisch genug
+    const elev = R.map(r => r.top || r.base || 1000);
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + R.map(r => r.lat).join(',') +
+      '&longitude=' + R.map(r => r.lon).join(',') + '&elevation=' + elev.join(',') +
+      '&daily=snowfall_sum,weather_code,sunshine_duration,daylight_duration,precipitation_sum' +
+      '&hourly=cloud_cover,visibility,weather_code&forecast_days=1&timezone=Europe%2FBerlin';
+    try {
+      const res = await fetch(url); if (!res.ok) throw new Error(res.status);
+      let j = await res.json(); if (!Array.isArray(j)) j = [j];
+      const d = {};
+      j.forEach((loc, i) => { const dl = loc.daily; d[R[i].id] = { t: dl.snowfall_sum[0], w: { code: dl.weather_code[0], snow: dl.snowfall_sum[0], precip: dl.precipitation_sum[0], stars: visStars(loc.hourly, dl, 0) } }; });
+      todayD = { date: j[0].daily.time[0], d }; todayT = Date.now();
+      try { localStorage.setItem(TODAY_KEY, JSON.stringify({ t: todayT, v: todayD })); } catch (e) { }
+    } catch (e) { /* bleibt bei der Prognose */ }
+  }
   async function loadSnow() {
     try {
       const c = JSON.parse(localStorage.getItem(SNOW_KEY) || 'null');
-      if (c && Date.now() - c.t < CACHE_MS) { snow = c.d; afterSnow(c.t); return; }
+      if (c) { snow = c.d; snowT = c.t; }
+      if (c && !stale(c.t, TTL.long, 6) && c.d[R[0].id]?.w?.[0]?.date === new Date().toLocaleDateString('sv-SE')) {
+        await loadToday(); applyToday(); afterSnow(Math.max(snowT, todayT)); return;
+      }
     } catch (e) { }
     const elev = R.map(r => r.top || r.base || 1000);
     const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + R.map(r => r.lat).join(',') +
@@ -170,9 +212,11 @@
         });
         snow[R[i].id] = { y: s[0], t: s[1], m: s[2], d2: s[3], depth: dep == null ? null : dep * 100, elev: elev[i], w };
       });
-      try { localStorage.setItem(SNOW_KEY, JSON.stringify({ t: Date.now(), d: snow })); } catch (e) { }
-      afterSnow(Date.now());
+      snowT = Date.now();
+      try { localStorage.setItem(SNOW_KEY, JSON.stringify({ t: snowT, d: snow })); } catch (e) { }
+      applyToday(); afterSnow(snowT);
     } catch (e) {
+      if (snowT) { applyToday(); afterSnow(snowT); return; } // alte Daten weiter zeigen
       $('#snowInfo').textContent = 'Schneedaten gerade nicht erreichbar';
       toast('Schneedaten konnten nicht geladen werden');
     }
@@ -486,16 +530,27 @@
     const days = S.checkins.length;
     return { value, fuel, days, saved: value - S.settings.pass, perDay: days ? (S.settings.pass + fuel) / days : null };
   }
+  // Knopf auf der Karte: kleine Pass-Karte, die sich mit jedem Skitag füllt (rot → grün, ab 100 % mit Haken)
+  function passBtn() {
+    const btn = document.getElementById('btnWallet'); if (!btn) return;
+    const b = balance(), f = S.settings.pass ? Math.max(0, Math.min(1, b.value / S.settings.pass)) : 0, done = f >= 1;
+    btn.innerHTML = `<svg viewBox="0 0 28 28" class="passIco"><rect x="3" y="7" width="22" height="15" rx="2.8" class="pc"/><rect x="4.3" y="8.3" width="${(19.4 * f).toFixed(2)}" height="12.4" rx="1.6" class="pf ${done ? 'ok' : ''}"/><rect x="11" y="9.6" width="6" height="1.9" rx=".95" class="ph"/><rect x="6.2" y="13.6" width="4.6" height="3.6" rx=".8" class="pm"/><path d="M13 14.4h7.2M13 17h4.6" class="pm"/>${done ? '<path d="M18.6 17.6l1.6 1.6 2.9-3" class="ck"/>' : ''}</svg><span class="pPct num">${Math.round(f * 100)}%</span>`;
+    btn.setAttribute('aria-label', `Pass-Bilanz: ${Math.round(f * 100)} % refinanziert`);
+  }
   function openWallet() {
     const b = balance(), pass = S.settings.pass, pos = b.saved >= 0;
     const pct = Math.min(100, pass ? b.value / pass * 100 : 0);
     const list = S.checkins.slice().reverse();
+    const avg = b.days ? b.value / b.days : 60, left = pos ? 0 : Math.ceil(-b.saved / avg);
     modal(`
-      <div class="mHead"><div class="h2">Pass-Bilanz 26/27</div><button class="iconBtn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-      <div class="big num ${pos ? 'pos' : 'neg'}">${pos ? '+' : '−'}${eur(Math.abs(b.saved))}</div>
-      <div class="muted">${pos ? 'durch den Pass gespart' : 'noch abzufahren, bis sich der Pass lohnt'}</div>
-      <div class="bar"><i style="width:${pct.toFixed(1)}%"></i></div>
-      <div class="muted small num">${eur(b.value)} von ${eur(pass)} Passpreis an Tageskarten abgefahren</div>
+      <div class="mHead"><div class="h2">Pass-Bilanz</div><button class="iconBtn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="passCard ${pos ? 'pos' : ''}">
+        <div class="pcTop"><span>3TälerPass 26/27</span><span class="num">${Math.round(pass ? b.value / pass * 100 : 0)} %</span></div>
+        <div class="pcBig num">${pos ? '+' : '−'}${eur(Math.abs(b.saved))}</div>
+        <div class="pcSub">${pos ? 'durch den Pass gespart' : `noch bis der Pass bezahlt ist · ca. ${left} Skitag${left === 1 ? '' : 'e'}`}</div>
+        <div class="pcBar"><i style="width:${pct.toFixed(1)}%"></i></div>
+        <div class="pcScale num"><span>${eur(b.value)} abgefahren</span><span>${eur(pass)}</span></div>
+      </div>
       <div class="tiles num">
         <div><span>Skitage</span><b>${b.days}</b></div>
         <div><span>Sprit gesamt</span><b>${eur(b.fuel)}</b></div>
@@ -527,7 +582,7 @@
     num($('#setPass'), 'pass'); num($('#setCons'), 'cons'); num($('#setFuel'), 'fuel');
     $('#fuelLive').onclick = async () => {
       const ft = S.settings.fuelT || 0;
-      if (Date.now() - ft < CACHE_MS) { toast(`Spritpreis ist vom ${hhmm(ft)} – neu abrufbar ab ${hhmm(ft + CACHE_MS)}`); return; }
+      if (Date.now() - ft < TTL.fuel) { toast(`Spritpreis ist vom ${hhmm(ft)} – neu abrufbar ab ${hhmm(ft + TTL.fuel)}`); return; }
       $('#fuelLive').textContent = 'Lade …';
       try {
         const j = await (await fetch('https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=47.41&longitude=9.74&fuelType=SUP&includeClosed=false')).json();
@@ -616,7 +671,7 @@
         }
         save(); home = homeOf(); homeMarker.setLatLng([home.lat, home.lon]);
         closeModal(); drawPins(); renderList(); computePodium(); if (current) renderDetail(current);
-        if (first && !S.toured) openTour(); else toast(`Fahrtzeiten ab ${name}`);
+        if (first && (S.tourV || 0) < TOUR_V) openTour(); else toast(`Fahrtzeiten ab ${name}`);
       } catch (e) { $('#hmMsg').textContent = 'Routenberechnung gerade nicht erreichbar – bitte später nochmal.'; }
     };
     $('#hmGo').onclick = async () => {
@@ -635,6 +690,7 @@
     $('#hmQ').onkeydown = e => { if (e.key === 'Enter') $('#hmGo').click(); };
   }
   // Kurze Einführung beim ersten Öffnen (zum Durchklicken, ca. 1 Minute)
+  const TOUR_V = 2; // Version der Einführung
   function openTour(start) {
     const pin = (fill, y, t, ring) => `<svg width="64" height="64" viewBox="-39 -39 78 78" aria-hidden="true">${ring ? `<polygon points="${hexPts(33)}" fill="none" stroke="${ring}" stroke-width="8" stroke-linejoin="round"/>` : ''}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/><polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${y} 200"/><polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${t} 200"/><polygon points="${hexPts(13)}" fill="${fill}"/></svg>`;
     const K = matchMedia('(prefers-color-scheme: dark)').matches ? ['Weiß', 'weiß'] : ['Schwarz', 'schwarz']; // Balkenfarbe „gestern“ folgt dem Hell-/Dunkelmodus
@@ -658,15 +714,22 @@
       const next = () => { if (id !== animId || ++k > 2) return; set(k); setTimeout(next, 850); };
       setTimeout(next, 850);
     };
+    // Balken: 0,5 s Pause zum Orientieren → weich (langsam–schnell–langsam) bis 30 cm → 0,5 s halten → sanft auf den Wert zurück
+    const ease = f => f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2; // easeInOutCubic: Tempo wie eine Glockenkurve
     const animBar = (which, cm) => {
-      const id = ++animId, el = $(which === 'y' ? '#tBarY' : '#tBarT'), out = $('#tCm'), dur = 1800;
-      const t0 = performance.now() + 500;
+      const id = ++animId, el = $(which === 'y' ? '#tBarY' : '#tBarT'), out = $('#tCm');
+      const WAIT = 500, UP = 1300, HOLD = 500, DOWN = 700, MAX = 30, t0 = performance.now();
+      const draw = v => { el.setAttribute('stroke-dasharray', `${(v / 30 * 100).toFixed(1)} 200`); el.setAttribute('opacity', v > 0.4 ? 1 : 0); out.textContent = `${Math.round(v)} cm`; };
+      if (!el) return; draw(0);
       const step = now => {
-        if (id !== animId || !el) return;
-        const f = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - f, 3), v = cm * e;
-        el.setAttribute('stroke-dasharray', `${(v / 30 * 100).toFixed(1)} 200`); el.setAttribute('opacity', v > 0.4 ? 1 : 0);
-        out.textContent = `${Math.round(v)} cm`;
-        if (f < 1) requestAnimationFrame(step);
+        if (id !== animId) return;
+        const t = now - t0; let v;
+        if (t < WAIT) v = 0;
+        else if (t < WAIT + UP) v = MAX * ease((t - WAIT) / UP);
+        else if (t < WAIT + UP + HOLD) v = MAX;
+        else v = MAX - (MAX - cm) * ease(Math.min(1, (t - WAIT - UP - HOLD) / DOWN));
+        draw(v);
+        if (t < WAIT + UP + HOLD + DOWN) requestAnimationFrame(step);
       };
       requestAnimationFrame(step);
     };
@@ -702,7 +765,7 @@
         const a = b.dataset.tour;
         if (a === 'next' && i < steps.length - 1) { i++; show(); return; }
         if (a === 'back') { i--; show(); return; }
-        if (a === 'next') { S.toured = true; save(); closeModal(); }
+        if (a === 'next') { S.toured = true; S.tourV = TOUR_V; save(); closeModal(); }
       });
     };
     show();
@@ -830,5 +893,7 @@
   const refresh = () => loadLifts().then(() => loadSnow());
   refresh();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-  if (!S.home) openHome(true);
+  // Neue Einführung (TOUR_V erhöhen) wird jedem einmal gezeigt – auch wer die App schon nutzt
+  passBtn();
+  if (!S.home) openHome(true); else if ((S.tourV || 0) < TOUR_V) openTour();
 })();

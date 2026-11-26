@@ -241,3 +241,21 @@ textarea{width:100%;min-height:90px;font:13px ui-monospace,monospace;color:var(-
 .tNum{font-weight:700;font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right}
 .tSq{display:inline-block;width:22px;height:22px;border-radius:5px;transition:background .25s}
 .tHint{text-align:center;margin:0}
+.fab#btnWallet{position:relative}
+.fab .passIco{width:30px;height:30px}
+.passIco .pc{fill:none;stroke:var(--ink);stroke-width:1.5}
+.passIco .pf{fill:rgba(224,72,62,.3);stroke:none}
+.passIco .pf.ok{fill:rgba(47,138,62,.35)}
+.passIco .pm{fill:none;stroke:var(--ink);stroke-width:1.4}
+.passIco .ph{fill:var(--ink);stroke:none}
+.passIco .ck{fill:none;stroke:var(--green);stroke-width:2.2}
+.pPct{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;background:var(--ink);color:var(--bg);border-radius:8px;padding:1px 5px;line-height:1.3}
+.passCard{background:linear-gradient(135deg,#1d2733,#2c3e52);color:#fff;border-radius:18px;padding:16px 18px 14px;margin:4px 0 6px;box-shadow:0 6px 18px rgba(0,0,0,.18);position:relative;overflow:hidden}
+.passCard.pos{background:linear-gradient(135deg,#1f5a2e,#2f8a3e)}
+.passCard::after{content:"";position:absolute;right:-20px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.06)}
+.pcTop{display:flex;justify-content:space-between;font-size:13px;font-weight:600;letter-spacing:.04em;opacity:.85}
+.pcBig{font-size:36px;font-weight:700;letter-spacing:-.5px;margin-top:6px;line-height:1.05}
+.pcSub{font-size:13px;opacity:.85;margin-top:2px}
+.pcBar{height:8px;border-radius:4px;background:rgba(255,255,255,.18);overflow:hidden;margin:12px 0 5px}
+.pcBar i{display:block;height:100%;background:#7fd38b;border-radius:4px}
+.pcScale{display:flex;justify-content:space-between;font-size:11.5px;opacity:.75}
