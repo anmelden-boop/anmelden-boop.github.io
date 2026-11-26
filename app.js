@@ -87,11 +87,14 @@
     if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
     return sc;
   }
+  // Alle Online-Daten werden 1 Stunde auf dem Gerät zwischengespeichert – weniger Abrufe, kein manuelles Neuladen
+  const CACHE_MS = 60 * 60 * 1000;
   const LIFT_KEY = 'dreitaeler-lifts';
+  let liftsT = 0;
   async function loadLifts() {
     try {
       const c = JSON.parse(localStorage.getItem(LIFT_KEY) || 'null');
-      if (c && Date.now() - c.t < 15 * 60 * 1000) { lifts = c.d; return; }
+      if (c && Date.now() - c.t < CACHE_MS) { lifts = c.d; liftsT = c.t; return; }
     } catch (e) { }
     try {
       const j = await (await fetch('https://www.3taeler.at/SkigebieteManager/Micado.SkigebieteManager.Plugin.RegionPlugin.RegionApiIO/List.api?region=3taeler')).json();
@@ -99,10 +102,10 @@
       (j.items || []).forEach(it => {
         const L = (it.facilityStatistics || []).find(f => f.identifier === 'lift');
         const r = R.find(x => x.link && it.pageName && x.link.endsWith(it.pageName));
-        if (L && r && L.count) d[r.id] = { open: L.countOpen, total: L.count };
+        if (r) { if (L && L.count) d[r.id] = { open: L.countOpen, total: L.count, st: it.openingState }; else if (it.openingState) d[r.id] = { st: it.openingState }; }
       });
-      lifts = d;
-      try { localStorage.setItem(LIFT_KEY, JSON.stringify({ t: Date.now(), d })); } catch (e) { }
+      lifts = d; liftsT = Date.now();
+      try { localStorage.setItem(LIFT_KEY, JSON.stringify({ t: liftsT, d })); } catch (e) { }
     } catch (e) { /* Liftstatus gerade nicht erreichbar */ }
   }
   function computePodium() {
@@ -112,7 +115,8 @@
   const MEDAL = { 1: '#e3a90f', 2: '#8fb3d9', 3: '#b5622a' }; // Gold, Silber (leicht bläulich, damit es sich abhebt), Bronze
   const MEDALNAME = { 1: 'Gold', 2: 'Silber', 3: 'Bronze' };
   const medalDot = id => podium[id] ? `<span class="medal" style="background:${MEDAL[podium[id]]}" title="Tipp für morgen: Platz ${podium[id]}">${podium[id]}</span>` : '';
-  const liftsTxt = r => { const L = lifts[r.id]; return L ? `${L.open}/${L.total}` : `–/${r.lifts ?? '–'}`; };
+  const liftsTxt = r => { const L = lifts[r.id]; return L?.total ? `${L.open}/${L.total}` : `–/${r.lifts ?? '–'}`; };
+  const hhmm = t => new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
   /* ---------- 3) Schneedaten (Open-Meteo, ein Abruf für alle Gebiete) ---------- */
   // snow[id] = { y: gestern, t: heute, m: morgen, d2: übermorgen, depth: Schneehöhe jetzt (cm), elev,
@@ -138,10 +142,10 @@
     if (!(cloud < 15 && sunFrac > 0.7)) st = Math.min(st, 4.5);
     return Math.max(0.5, Math.min(5, st));
   }
-  async function loadSnow(force) {
+  async function loadSnow() {
     try {
       const c = JSON.parse(localStorage.getItem(SNOW_KEY) || 'null');
-      if (!force && c && Date.now() - c.t < 30 * 60 * 1000) { snow = c.d; afterSnow(c.t); return; }
+      if (c && Date.now() - c.t < CACHE_MS) { snow = c.d; afterSnow(c.t); return; }
     } catch (e) { }
     const elev = R.map(r => r.top || r.base || 1000);
     const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + R.map(r => r.lat).join(',') +
@@ -320,7 +324,7 @@
       </div>
       <div class="metrics num">
         <div title="ab ${esc(home.name)}"><span>Anfahrt</span><b>${hm(driveMin(r))}</b><small>${Math.round(roadKm(r))} km</small><small>${eur(fc)} Sprit</small></div>
-        <div><span>Lifte offen</span><b>${r.noSki ? '–' : liftsTxt(r)}</b><small>${lifts[r.id] ? 'live 3Täler' : 'kein Status'}</small></div>
+        <div><span>Lifte offen</span><b>${r.noSki ? '–' : liftsTxt(r)}</b><small>${lifts[r.id]?.total ? '3Täler · ' + hhmm(liftsT) : 'kein Status'}</small></div>
         <div><span>Sicht heute</span><b>${starsOf(id, 0) != null ? num1(starsOf(id, 0)) : '–'}</b>${starsHTML(starsOf(id, 0))}</div>
         <div><span>Sicht morgen</span><b>${starsOf(id, 1) != null ? num1(starsOf(id, 1)) : '–'}</b>${starsHTML(starsOf(id, 1))}</div>
       </div>
@@ -367,13 +371,20 @@
   function parkHTML(r) {
     const P = r.parking || [];
     const gm = (lat, lon) => `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-    if (!P.length) return `<div class="secT">Parken</div><a class="btn wide" target="_blank" rel="noopener" href="https://www.google.com/maps/search/${encodeURIComponent('Parkplatz ' + r.name.replace(/\s*\(.*\)/, ''))}/@${r.lat},${r.lon},15z">Kein Skiparkplatz bekannt – in Google Maps suchen ↗</a>`;
+    if (!P.length) return `<div class="secT">Parken</div><a class="btn wide" target="_blank" rel="noopener" href="https://www.google.com/maps/search/${encodeURIComponent('Parkplatz ' + r.name.replace(/\s*\(.*\)/, ''))}/@${r.lat},${r.lon},15z">Kein Skiparkplatz bekannt – in Google Maps suchen ↗</a>${hoursHTML(r)}`;
     return `<div class="secT">Parken <span class="muted small">(nächste Parkplätze an den Liften)</span></div>
       <ul class="park">${P.map((p, i) => `<li><a target="_blank" rel="noopener" href="${gm(p.lat, p.lon)}">
         <span class="pIcon">P${P.length > 1 ? i + 1 : ''}</span>
         <span class="t"><b>${esc(p.n)}</b><span class="muted small">${p.d} m zum Lift${p.lift && !p.n.includes(p.lift) ? ' ' + esc(p.lift) : ''} · ${p.sz}${p.fee === 1 ? ' · kostenpflichtig' : p.fee === 0 ? ' · kostenlos' : ''}</span></span>
         <span class="go">Maps ↗</span></a></li>`).join('')}</ul>
-      <p class="note">Aus OpenStreetMap: öffentliche Parkplätze nahe den Talstationen, ohne Privat- und Kundenparkplätze.</p>`;
+      <p class="note">Aus OpenStreetMap: öffentliche Parkplätze nahe den Talstationen, ohne Privat- und Kundenparkplätze.</p>${hoursHTML(r)}`;
+  }
+  function hoursHTML(r) {
+    const st = lifts[r.id]?.st;
+    const state = st === 'open' ? '<b class="ok">heute geöffnet</b>' : st === 'closed' ? '<b class="no">heute geschlossen</b>' : '';
+    return `<div class="hours"><div class="secT">Öffnungszeiten</div>
+      <p class="note">${state ? `Laut 3TälerPass ${state} (Stand ${hhmm(liftsT)}). ` : ''}Lift- und Betriebszeiten unterscheiden sich je nach Gebiet, Wochentag und Saison – kleine Lifte fahren oft nur am Wochenende, in den Ferien oder bei genug Schnee. Verbindlich sind nur die Angaben des Betreibers.</p>
+      <a class="btn wide" target="_blank" rel="noopener" href="${esc(r.web || r.link)}">Öffnungszeiten beim Betreiber prüfen ↗</a></div>`;
   }
   function wxHTML(r) {
     const w = snow[r.id]?.w;
@@ -515,12 +526,14 @@
     $('#setTour').onclick = () => openTour();
     num($('#setPass'), 'pass'); num($('#setCons'), 'cons'); num($('#setFuel'), 'fuel');
     $('#fuelLive').onclick = async () => {
+      const ft = S.settings.fuelT || 0;
+      if (Date.now() - ft < CACHE_MS) { toast(`Spritpreis ist vom ${hhmm(ft)} – neu abrufbar ab ${hhmm(ft + CACHE_MS)}`); return; }
       $('#fuelLive').textContent = 'Lade …';
       try {
         const j = await (await fetch('https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=47.41&longitude=9.74&fuelType=SUP&includeClosed=false')).json();
         const pr = j.map(s => s.prices?.[0]?.amount).filter(Boolean).slice(0, 5);
         if (!pr.length) throw new Error('leer');
-        S.settings.fuel = Math.round(pr.reduce((a, b) => a + b, 0) / pr.length * 1000) / 1000; save();
+        S.settings.fuel = Math.round(pr.reduce((a, b) => a + b, 0) / pr.length * 1000) / 1000; S.settings.fuelT = Date.now(); save();
         toast(`Super 95 rund um Dornbirn: ${S.settings.fuel.toLocaleString('de-DE')} €/l`);
         renderList(); if (current) renderDetail(current); openWallet();
       } catch (e) { $('#fuelLive').textContent = 'Nicht erreichbar – später nochmal'; }
