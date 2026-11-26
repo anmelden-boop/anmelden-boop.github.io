@@ -638,15 +638,49 @@
   function openTour(start) {
     const pin = (fill, y, t, ring) => `<svg width="64" height="64" viewBox="-39 -39 78 78" aria-hidden="true">${ring ? `<polygon points="${hexPts(33)}" fill="none" stroke="${ring}" stroke-width="8" stroke-linejoin="round"/>` : ''}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/><polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${y} 200"/><polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${t} 200"/><polygon points="${hexPts(13)}" fill="${fill}"/></svg>`;
     const K = matchMedia('(prefers-color-scheme: dark)').matches ? ['Weiß', 'weiß'] : ['Schwarz', 'schwarz']; // Balkenfarbe „gestern“ folgt dem Hell-/Dunkelmodus
+    // Animierte Pin-Erklärung: großer Pin mit Hinweisstrichen
+    const SIZES = [['#e0483e', 'Kleines Gebiet', 'unter 8 km Piste'], ['#ef9f27', 'Mittleres Gebiet', '8–25 km Piste'], ['#2f7fd8', 'Großes Gebiet', 'ab 25 km Piste']];
+    const apin = mode => {
+      const lead = mode === 'size' ? `<line x1="8" y1="0" x2="52" y2="0" class="tLead"/><circle cx="8" cy="0" r="1.6" class="tDot"/><text x="55" y="1.6" class="tLbl">Farbe innen</text><text x="55" y="9" class="tLbl s">= Größe</text>`
+        : mode === 'y' ? `<line x1="-21" y1="2" x2="-52" y2="2" class="tLead"/><circle cx="-21" cy="2" r="1.6" class="tDot"/><text x="-55" y="0" class="tLbl" text-anchor="end">linker Rand</text><text x="-55" y="8" class="tLbl s" text-anchor="end">= gestern</text>`
+        : `<line x1="21" y1="2" x2="52" y2="2" class="tLead"/><circle cx="21" cy="2" r="1.6" class="tDot"/><text x="55" y="0" class="tLbl">rechter Rand</text><text x="55" y="8" class="tLbl s">= heute</text>`;
+      const full = mode === 'size' ? '' : `<line x1="0" y1="-24" x2="${mode === 'y' ? -30 : 30}" y2="-38" class="tLead"/><text x="${mode === 'y' ? -32 : 32}" y="-36" class="tLbl s" text-anchor="${mode === 'y' ? 'end' : 'start'}">oben = 30 cm</text>`;
+      return `<svg viewBox="-110 -44 220 86" class="tBig" aria-hidden="true">${lead}${full}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/>`
+        + `<polyline id="tBarY" points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="0 200" opacity="0"/>`
+        + `<polyline id="tBarT" points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="0 200" opacity="0"/>`
+        + `<polygon id="tCore" points="${hexPts(13)}" fill="${mode === 'size' ? SIZES[0][0] : '#2f7fd8'}"/></svg>`;
+    };
+    let animId = 0;
+    const animSize = () => {
+      const id = ++animId; let k = 0;
+      const set = j => { const [c, t, sub] = SIZES[j]; $('#tCore')?.setAttribute('fill', c); if ($('#tSq')) { $('#tSq').style.background = c; $('#tCapT').textContent = t; $('#tCapS').textContent = sub; } };
+      set(0);
+      const next = () => { if (id !== animId || ++k > 2) return; set(k); setTimeout(next, 850); };
+      setTimeout(next, 850);
+    };
+    const animBar = (which, cm) => {
+      const id = ++animId, el = $(which === 'y' ? '#tBarY' : '#tBarT'), out = $('#tCm'), dur = 1800;
+      const t0 = performance.now() + 500;
+      const step = now => {
+        if (id !== animId || !el) return;
+        const f = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - f, 3), v = cm * e;
+        el.setAttribute('stroke-dasharray', `${(v / 30 * 100).toFixed(1)} 200`); el.setAttribute('opacity', v > 0.4 ? 1 : 0);
+        out.textContent = `${Math.round(v)} cm`;
+        if (f < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
     const steps = [
       ['Willkommen 👋', `<p>Die Karte zeigt alle <b>38 Gebiete</b> deines 3TälerPass. Unten ist die <b>Liste</b> – nach oben ziehen zum Aufklappen.</p><p><b>Pin oder Listeneintrag antippen</b> öffnet das Gebiet mit Fotos, Webcams, Wetter und Parkplätzen.</p>`],
-      ['So liest du einen Pin', `<p class="tIntro">Jeder Pin zeigt <b>Größe</b> und <b>Neuschnee</b> auf einen Blick:</p>
-        <div class="tEx">
-          <div class="tCard">${pin('#2f7fd8', 15, 90)}<b>Beispiel A</b><span><i class="dot" style="background:#2f7fd8"></i>Blau = großes Gebiet</span><span>wenig <b>${K[0]}</b>: gestern ca. 4 cm</span><span>viel <b class="g">Grün</b>: heute ca. 27 cm</span><em>→ großes Gebiet, frischer Pulver</em></div>
-          <div class="tCard">${pin('#e0483e', 85, 12)}<b>Beispiel B</b><span><i class="dot" style="background:#e0483e"></i>Rot = kleines Gebiet</span><span>viel <b>${K[0]}</b>: gestern ca. 25 cm</span><span>wenig <b class="g">Grün</b>: heute ca. 4 cm</span><em>→ kleines Gebiet, Schnee von gestern</em></div>
-        </div>
-        <p class="tRule"><b>Linker Rand ${K[1]}</b> = Neuschnee gestern · <b class="g">rechter Rand grün</b> = Neuschnee heute · je voller der Rand, desto mehr – <b>ganz voll = 30 cm</b> oder mehr.</p>
-        <p class="tLeg"><b>Farbe innen = Größe:</b> <span style="background:#2f7fd8"></span>groß ≥ 25 km <span style="background:#ef9f27"></span>mittel 8–25 km <span style="background:#e0483e"></span>klein &lt; 8 km <span style="background:#9a9a9a"></span>Karren</p>`],
+      ['Pin: Größe des Gebiets', `<div class="tAnim" data-anim="size">${apin('size')}</div>
+        <div class="tCap"><span class="tSq" id="tSq"></span><b id="tCapT">Kleines Gebiet</b><span class="muted" id="tCapS">unter 8 km Piste</span></div>
+        <p class="muted small tHint">Die Farbe innen zeigt die Größe – rot, gelb oder blau.</p>`, () => animSize()],
+      ['Pin: Neuschnee gestern', `<div class="tAnim">${apin('y')}</div>
+        <div class="tCap"><b>Gestern</b><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee</span></div>
+        <p class="muted small tHint">Linker Rand (${K[1]}) = Neuschnee gestern. Ganz voll = 30 cm.</p>`, () => animBar('y', 18)],
+      ['Pin: Neuschnee heute', `<div class="tAnim">${apin('t')}</div>
+        <div class="tCap"><b>Heute</b><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee</span></div>
+        <p class="muted small tHint">Rechter Rand (grün) = Neuschnee heute. Ganz voll = 30 cm.</p>`, () => animBar('t', 24)],
       ['Gold, Silber, Bronze', `<div class="tPin">${pin('#2f7fd8', 30, 60, MEDAL[1])}${pin('#ef9f27', 20, 40, MEDAL[2])}${pin('#2f7fd8', 10, 50, MEDAL[3])}</div><p>Die drei Gebiete mit den <b>besten Bedingungen für morgen</b> bekommen einen farbigen Rahmen – aus Wetter, Schnee, Panorama, Pistengröße, offenen Liften und (wenig) Anfahrt.</p>`],
       ['Ein Gebiet im Detail', `<p>Oben vier Kacheln: <b>Fahrtzeit</b> ab deinem Wohnort, <b>offene Lifte</b> (live von 3Täler) und die <b>Sicht</b> heute und morgen in Sternen – 5 Sterne heißt Sonne ohne Wolken.</p><p>Darunter Wetter für 7 Tage, <b>Parkplätze</b> mit Link zu Google Maps und die Website des Gebiets.</p>`],
       ['Einchecken lohnt sich', `<p>Tippe im Gebiet unten auf <b>„Einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
@@ -662,6 +696,7 @@
         <div class="tBody">${body}</div>
         <div class="tDots">${steps.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
         <div class="btnGrid">${i ? '<button class="btn" data-tour="back">Zurück</button>' : '<span></span>'}<button class="btn primary" data-tour="next">${i === steps.length - 1 ? 'Verstanden – los geht’s' : 'Weiter'}</button></div></div>`, 'tour');
+      animId++; const run = steps[i][2]; if (run) { run(); $('#modal .tAnim').onclick = () => run(); }
       $('#modal').querySelectorAll('[data-tour]').forEach(b => b.onclick = e => {
         e.stopPropagation();
         const a = b.dataset.tour;
