@@ -91,17 +91,17 @@
 
   // Sechseck-Punkte, Spitze oben
   const hexPts = rad => [0, 1, 2, 3, 4, 5].map(i => { const a = Math.PI / 3 * i - Math.PI / 2; return `${(rad * Math.cos(a)).toFixed(2)},${(rad * Math.sin(a)).toFixed(2)}`; }).join(' ');
-  // Balken laufen von der unteren Spitze nach oben: links = gestern (grün), rechts = morgen (dunkel)
+  // Balken laufen von der unteren Spitze nach oben: links = Neuschnee gestern (schwarz), rechts = Neuschnee heute (grün)
   const sidePts = (rad, dir) => { const x = rad * Math.cos(Math.PI / 6) * dir, y = rad / 2; return `0,${rad} ${x.toFixed(2)},${y} ${x.toFixed(2)},${-y} 0,${-rad}`; };
   const frac = v => Math.max(0, Math.min(1, (v || 0) / 30)); // 30 cm = voller Balken
   function pinSVG(r, size) {
     const sn = snow[r.id];
-    const fy = sn ? frac(sn.y) : 0, fm = sn ? frac(sn.m) : 0;
+    const fy = sn ? frac(sn.y) : 0, ft = sn ? frac(sn.t) : 0;
     const bars = r.noSki ? '' : `
       <polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/>
-      ${fy > 0 ? `<polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(fy * 100).toFixed(1)} 200"/>` : ''}
-      ${fm > 0 ? `<polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(fm * 100).toFixed(1)} 200"/>` : ''}
-      ${sn && sn.m > 30 ? '<circle cx="0" cy="-30" r="3.2" style="fill:var(--snowM)"/>' : ''}`;
+      ${fy > 0 ? `<polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(fy * 100).toFixed(1)} 200"/>` : ''}
+      ${ft > 0 ? `<polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(ft * 100).toFixed(1)} 200"/>` : ''}
+      ${sn && (sn.y > 30 || sn.t > 30) ? '<circle cx="0" cy="-30" r="3.2" style="fill:var(--snowY)"/>' : ''}`;
     const fav = isFav(r.id) ? '<polygon points="22,-31 24.4,-26 30,-25.4 25.8,-21.6 27,-16 22,-18.8 17,-16 18.2,-21.6 14,-25.4 19.6,-26" fill="#f2b01e" stroke="#fff" stroke-width="1"/>' : '';
     return `<svg width="${size}" height="${size}" viewBox="-34 -34 68 68" aria-hidden="true">
       <polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
@@ -202,8 +202,8 @@
       <div class="drive num"><b>${drive(r)}</b> ab Friedrichshafen · Sprit hin + zurück <b>${eur(fc)}</b></div>
       ${r.noSki ? '<p class="note">Seilbahn zum Winterwandern – kein Skigebiet, zählt nicht als Skitag.</p>' : `
       <div class="snowGrid num">
-        <div class="gy"><b>${cm(s?.y)}</b><span>gestern</span></div>
-        <div><b>${cm(s?.t)}</b><span>heute</span></div>
+        <div class="gd"><b>${cm(s?.y)}</b><span>gestern</span></div>
+        <div class="gy"><b>${cm(s?.t)}</b><span>heute</span></div>
         <div><b>${cm(s?.m)}</b><span>morgen</span></div>
         <div><b>${cm(s?.depth)}</b><span>Schneehöhe</span></div>
       </div>

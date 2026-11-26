@@ -93,6 +93,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .snowGrid b{display:block;font-size:17px;font-weight:600}
 .snowGrid span{font-size:11px;color:var(--muted)}
 .snowGrid .gy{background:rgba(90,158,42,.15)} .snowGrid .gy b{color:var(--snowY)}
+.snowGrid .gd{background:rgba(128,128,128,.16)} .snowGrid .gd b{color:var(--snowM)}
 .pano{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);margin-top:8px}
 .mtns{display:flex;gap:3px}
 .mtns button{border:0;background:none;padding:2px}
