@@ -28,6 +28,8 @@
     <button class="chip" data-filter="snow">Neuschnee</button>
     <button class="chip" data-filter="fav">★ Favoriten</button>
     <button class="chip" data-filter="big">Groß (≥ 25 km)</button>
+    <button class="chip" data-filter="sunT">☀ Gute Sicht heute</button>
+    <button class="chip" data-filter="sunM">☀ Gute Sicht morgen</button>
   </div>
 </div>
 
@@ -59,8 +61,10 @@
         <div class="seg" role="tablist">
           <button data-sort="time" class="on">Fahrtzeit</button>
           <button data-sort="snow">Neuschnee</button>
+          <button data-sort="wx">Wetter</button>
         </div>
       </div>
+      <div id="podium" hidden></div>
       <ul id="list"></ul>
     </div>
     <div id="detailView" hidden></div>

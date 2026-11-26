@@ -89,7 +89,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/salober-tal-skifahrer-familie-sl-schrcken-196.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.warth-schroecken.com",
+"webKind": "gt"
 },
 {
 "id": "damuels-mellau",
@@ -151,7 +153,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/snowpark-damuels-18.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.damuels-mellau.at",
+"webKind": "op"
 },
 {
 "id": "diedamskopf",
@@ -232,7 +236,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/66555-diedamskopf-09-02-2020-action-fs-unknown-rider-christian-riefenberg-qparks-62.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.diedamskopf.at",
+"webKind": "op"
 },
 {
 "id": "sonnenkopf",
@@ -281,7 +287,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/sk2-172.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://sonnenkopf.com/de/",
+"webKind": "op"
 },
 {
 "id": "faschina",
@@ -330,7 +338,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/schneereich-faschina008.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.seilbahnen-faschina.at",
+"webKind": "op"
 },
 {
 "id": "balderschwang",
@@ -378,7 +388,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/women-high-five.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.skigebiet-balderschwang.de",
+"webKind": "op"
 },
 {
 "id": "laterns",
@@ -423,7 +435,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/4er.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.laterns.net/winter",
+"webKind": "op"
 },
 {
 "id": "boedele",
@@ -480,7 +494,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/20170218-boedele014cjuergenkostelactarifgemeinschaftboedele.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.boedele.info",
+"webKind": "op"
 },
 {
 "id": "steibis",
@@ -525,7 +541,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/i-winter-10.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.huendle-imberg.de",
+"webKind": "op"
 },
 {
 "id": "huendle",
@@ -562,7 +580,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/2021-01-11.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.huendle-imberg.de",
+"webKind": "op"
 },
 {
 "id": "schetteregg",
@@ -619,7 +639,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/bg9i7628.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.schetteregg.at",
+"webKind": "op"
 },
 {
 "id": "hochhaederich",
@@ -659,7 +681,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/20130123-1073.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.alpenarena.com/de",
+"webKind": "op"
 },
 {
 "id": "hochgrat",
@@ -712,7 +736,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/winter-sonnenuntergang-9.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://hochgrat.de",
+"webKind": "op"
 },
 {
 "id": "sonntag",
@@ -737,7 +763,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/12011405.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.seilbahnen-sonntag.at/de",
+"webKind": "op"
 },
 {
 "id": "raggal",
@@ -777,7 +805,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/raggal004.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "http://www.skilifte-raggal.com",
+"webKind": "op"
 },
 {
 "id": "joechelspitze",
@@ -809,7 +839,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/lechtal-alexkaiser-1044.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.lechtaler-bergbahnen.at",
+"webKind": "op"
 },
 {
 "id": "niedere",
@@ -862,7 +894,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/seilbahn-bezau-winter-2.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.seilbahn-bezau.at",
+"webKind": "op"
 },
 {
 "id": "hochlitten",
@@ -907,7 +941,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/hochlitten-.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.skilifte-hochlitten.com",
+"webKind": "op"
 },
 {
 "id": "alberschwende",
@@ -931,7 +967,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/20210121-145318-1.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.skilifte-alberschwende.at",
+"webKind": "op"
 },
 {
 "id": "groellerkopf",
@@ -959,7 +997,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/img-20160118-144834.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.uebersaxen.at",
+"webKind": "gt"
 },
 {
 "id": "heumoeser",
@@ -1011,7 +1051,9 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/lift.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.lechtal.at",
+"webKind": "gt"
 },
 {
 "id": "hittisberg",
@@ -1044,7 +1086,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/img-8795.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.hittisau.at",
+"webKind": "gt"
 },
 {
 "id": "kraehenberg",
@@ -1084,7 +1128,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/dsc08374.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.kraehenberg.at",
+"webKind": "op"
 },
 {
 "id": "luggi-leitner",
@@ -1116,7 +1162,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/luggi-leitner-lift-4.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.moeggers.at",
+"webKind": "gt"
 },
 {
 "id": "schneiderkopf",
@@ -1185,7 +1233,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/kleines-bild-kinderkurs3.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.skilifte-sinswang.de",
+"webKind": "op"
 },
 {
 "id": "huetten",
@@ -1213,7 +1263,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/img-0608.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.bizau.at",
+"webKind": "gt"
 },
 {
 "id": "karren",
@@ -1247,7 +1299,9 @@ window.RESORTS=[
 "u": "https://ski.3taeler.at/media/gallery/karren-winter-c-dsg-03.jpg",
 "c": "3TälerPass / Betreiber"
 }
-]
+],
+"web": "https://www.karren.at",
+"webKind": "op"
 },
 {
 "id": "gurtis",
@@ -1293,7 +1347,9 @@ window.RESORTS=[
 "u": "https://cdn.prod.website-files.com/5fcf7561abc0a207e90d52fe/5fd27620052d1b1e85c96122_93052D81-C492-4198-A851-1EB430478796-p-1600.jpeg",
 "c": "Skilifte Gurtis"
 }
-]
+],
+"web": "https://www.schilift-bazora.at",
+"webKind": "op"
 },
 {
 "id": "schuttannen",
@@ -1327,7 +1383,9 @@ window.RESORTS=[
 "u": "https://www.bodensee-vorarlberg.com/uploads/media/930x560/00/22530-Skiverein-Hohenems-Schuttannen.jpg",
 "c": "Bodensee-Vorarlberg Tourismus / SV Hohenems"
 }
-]
+],
+"web": "https://www.sv-hohenems.at",
+"webKind": "op"
 },
 {
 "id": "dorflift-sulzberg",
@@ -1357,7 +1415,9 @@ window.RESORTS=[
 "u": "https://www.dorflift.com/images/Dorflift_Kirmair.jpg",
 "c": "Dorflift Sulzberg"
 }
-]
+],
+"web": "https://www.dorflift.com",
+"webKind": "op"
 },
 {
 "id": "baienberg",
@@ -1377,7 +1437,9 @@ window.RESORTS=[
 "cams": [],
 "pano": 1,
 "mapOnly": true,
-"photos": []
+"photos": [],
+"web": "https://www.reuthe.at",
+"webKind": "gt"
 },
 {
 "id": "elbigenalp",
@@ -1414,7 +1476,9 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/skilift.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.knitteltirol.at",
+"webKind": "op"
 },
 {
 "id": "stanzach",
@@ -1439,7 +1503,9 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/familienskilift-stanzach.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.stanzach.at",
+"webKind": "gt"
 },
 {
 "id": "gramais",
@@ -1464,7 +1530,9 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/uebungslift-gramais.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.lechtal.at",
+"webKind": "gt"
 },
 {
 "id": "boden",
@@ -1489,7 +1557,9 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/skifahren-boden.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.lechtal.at",
+"webKind": "gt"
 },
 {
 "id": "haeselgehr",
@@ -1514,6 +1584,8 @@ window.RESORTS=[
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/lift-1.webp",
 "c": "Lechtal Tourismus"
 }
-]
+],
+"web": "https://www.lechtal.at",
+"webKind": "gt"
 }
 ];

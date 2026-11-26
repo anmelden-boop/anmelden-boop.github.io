@@ -37,11 +37,84 @@
   const sizeName = r => r.noSki ? 'Seilbahn' : sizeKm(r) >= 25 ? 'groß' : sizeKm(r) >= 8 ? 'mittel' : 'klein';
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
   const cm = v => (v == null ? '–' : `${Math.round(v)} cm`);
+  const starsOf = (id, d) => snow[id]?.w?.[d]?.stars ?? null; // d: 0 = heute, 1 = morgen
+  const num1 = v => v.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+  const STAR = 'M12 2.8l2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17.1 6.4 20l1.1-6.2L2.9 9.4l6.3-.9z';
+  const starsHTML = v => v == null ? '<span class="muted">–</span>' : `<span class="stars" role="img" aria-label="${num1(v)} von 5 Sternen">${[0, 1, 2, 3, 4].map(i => {
+    const f = Math.max(0, Math.min(1, v - i)) * 100;
+    return `<span class="st"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="e" d="${STAR}"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" style="clip-path:inset(0 ${100 - f}% 0 0)"><path class="f" d="${STAR}"/></svg></span>`;
+  }).join('')}</span>`;
+  // Wetter-Symbole nach WMO-Code
+  const wLabel = c => c == null ? '–' : c === 0 ? 'Sonnig' : c <= 2 ? 'Heiter' : c === 3 ? 'Bewölkt' : c <= 48 ? 'Nebel' : c <= 57 ? 'Nieselregen' : c <= 67 ? 'Regen' : c <= 77 ? 'Schneefall' : c <= 82 ? 'Regenschauer' : c <= 86 ? 'Schneeschauer' : 'Gewitter';
+  function wIcon(c) {
+    const sun = '<circle cx="12" cy="12" r="4.2" class="sun"/><path class="sun" d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>';
+    const cloud = (y = 0) => `<path d="M7 ${18 + y}h10.5a3.5 3.5 0 0 0 .3-7 5 5 0 0 0-9.6-1.2A3.9 3.9 0 0 0 7 ${18 + y}z"/>`;
+    let g;
+    if (c == null) g = '';
+    else if (c === 0) g = sun;
+    else if (c <= 2) g = '<g transform="translate(-3 -3) scale(.8)">' + sun + '</g>' + cloud(1);
+    else if (c === 3) g = cloud();
+    else if (c <= 48) g = '<path d="M4 9h16M3 13h18M5 17h14"/>';
+    else if (c <= 67 || (c >= 80 && c <= 82)) g = cloud(-3) + '<path d="M9 18l-1 3M13 18l-1 3M17 18l-1 3"/>';
+    else if (c <= 77 || c <= 86) g = cloud(-3) + '<path d="M8.5 19.5h.01M12.5 21h.01M16.5 19.5h.01M10.5 22.5h.01M14.5 22.5h.01" stroke-width="2.4"/>';
+    else g = cloud(-3) + '<path d="M13 16l-2.5 3.5h3L11 23" class="bolt"/>';
+    return `<svg class="wi" viewBox="0 0 24 24" aria-hidden="true">${g}</svg>`;
+  }
+  const dayName = (iso, i) => i === 0 ? 'Heute' : i === 1 ? 'Morgen' : new Date(iso + 'T12:00').toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', '');
+
+  // Tipp für morgen: Mischung aus Wetter, Schnee, Panorama, Größe, offenen Liften und (schwach) Anfahrt
+  let podium = {}; // id -> 1|2|3
+  let lifts = {};  // id -> { open, total } (sobald Liftstatus verfügbar ist)
+  function scoreTomorrow(r) {
+    const s = snow[r.id]; if (!s || r.noSki) return null;
+    const parts = [];
+    parts.push([0.25, (starsOf(r.id, 1) ?? 2.5) / 5]);                                          // Wetter/Sicht morgen
+    const fresh = (s.t || 0) + (s.m || 0);
+    const snowQ = s.depth == null ? Math.min(1, fresh / 20) : 0.5 * Math.min(1, fresh / 20) + 0.5 * Math.min(1, s.depth / 100);
+    parts.push([0.25, snowQ]);                                                                  // Schnee
+    parts.push([0.20, (panoOf(r) - 1) / 4]);                                                    // Panorama
+    parts.push([0.15, Math.log(1 + sizeKm(r)) / Math.log(1 + 90)]);                             // Pistengröße
+    const L = lifts[r.id]; if (L && L.total) parts.push([0.10, L.open / L.total]);              // offene Lifte
+    parts.push([0.05, 1 - Math.min(1, r.driveMin / 150)]);                                      // Anfahrt
+    const wsum = parts.reduce((a, p) => a + p[0], 0);
+    let sc = parts.reduce((a, p) => a + p[0] * p[1], 0) / wsum;
+    if (s.depth != null && s.depth < 15 && fresh < 10) sc *= 0.5; // zu wenig Schnee
+    if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
+    return sc;
+  }
+  function computePodium() {
+    podium = {};
+    R.map(r => [r.id, scoreTomorrow(r)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 3).forEach((x, i) => podium[x[0]] = i + 1);
+  }
+  const MEDAL = { 1: '#d4a72c', 2: '#a9b1b9', 3: '#b8733a' };
+  const MEDALNAME = { 1: 'Gold', 2: 'Silber', 3: 'Bronze' };
+  const medalDot = id => podium[id] ? `<span class="medal" style="background:${MEDAL[podium[id]]}" title="Tipp für morgen: Platz ${podium[id]}">${podium[id]}</span>` : '';
+  const liftsTxt = r => { const L = lifts[r.id]; return L ? `${L.open}/${L.total}` : `–/${r.lifts ?? '–'}`; };
 
   /* ---------- 3) Schneedaten (Open-Meteo, ein Abruf für alle Gebiete) ---------- */
-  // snow[id] = { y: gestern, t: heute, m: morgen, d2: übermorgen, depth: Schneehöhe jetzt (cm), elev }
+  // snow[id] = { y: gestern, t: heute, m: morgen, d2: übermorgen, depth: Schneehöhe jetzt (cm), elev,
+  //             w: [7 Tage ab heute: { date, code, tmax, tmin, snow, precip, stars }] }
   let snow = {};
-  const SNOW_KEY = 'dreitaeler-snow';
+  const SNOW_KEY = 'dreitaeler-wx2';
+
+  // Sichtverhältnis 0,5–5 Sterne (halbe Schritte) für einen Tag, aus Wolken, Sonnenstunden, Sichtweite, Nebel und Niederschlag
+  // zwischen 9 und 16 Uhr in Gipfelhöhe. 5 Sterne nur bei sonnigem, praktisch wolkenfreiem Wetter.
+  function visStars(h, dl, di) {
+    const hrs = []; for (let k = 9; k <= 16; k++) hrs.push(di * 24 + k);
+    const avg = a => { const v = a.filter(x => x != null); return v.length ? v.reduce((x, y) => x + y, 0) / v.length : null; };
+    const cloud = avg(hrs.map(i => h.cloud_cover[i])) ?? 50;
+    const vis = avg(hrs.map(i => h.visibility[i]));
+    const fog = hrs.filter(i => [45, 48].includes(h.weather_code[i])).length;
+    const sunFrac = dl.daylight_duration[di] ? (dl.sunshine_duration[di] || 0) / dl.daylight_duration[di] : 0;
+    const pr = dl.precipitation_sum[di] || 0;
+    let q = 0.55 * (1 - cloud / 100) + 0.45 * Math.min(1, sunFrac / 0.8);
+    if (vis != null) q *= Math.sqrt(Math.max(0.15, Math.min(1, vis / 20000)));
+    if (pr > 2) q *= 0.6; else if (pr > 0.3) q *= 0.8;
+    if (fog >= 3) q = Math.min(q, 0.2);
+    let st = Math.round(q * 10) / 2;
+    if (!(cloud < 15 && sunFrac > 0.7)) st = Math.min(st, 4.5);
+    return Math.max(0.5, Math.min(5, st));
+  }
   async function loadSnow(force) {
     try {
       const c = JSON.parse(localStorage.getItem(SNOW_KEY) || 'null');
@@ -50,7 +123,8 @@
     const elev = R.map(r => r.top || r.base || 1000);
     const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + R.map(r => r.lat).join(',') +
       '&longitude=' + R.map(r => r.lon).join(',') + '&elevation=' + elev.join(',') +
-      '&daily=snowfall_sum&hourly=snow_depth&past_days=1&forecast_days=3&timezone=Europe%2FBerlin';
+      '&daily=snowfall_sum,weather_code,temperature_2m_max,temperature_2m_min,sunshine_duration,daylight_duration,precipitation_sum' +
+      '&hourly=snow_depth,cloud_cover,visibility,weather_code&past_days=1&forecast_days=7&timezone=Europe%2FBerlin';
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(res.status);
@@ -61,7 +135,13 @@
       j.forEach((loc, i) => {
         const s = loc.daily.snowfall_sum;
         const dep = loc.hourly.snow_depth[24 + nowH]; // Stunde jetzt (Tag 2 der Reihe = heute)
-        snow[R[i].id] = { y: s[0], t: s[1], m: s[2], d2: s[3], depth: dep == null ? null : dep * 100, elev: elev[i] };
+        const dl = loc.daily, h = loc.hourly;
+        const w = [];
+        for (let di = 1; di < dl.time.length; di++) w.push({
+          date: dl.time[di], code: dl.weather_code[di], tmax: dl.temperature_2m_max[di], tmin: dl.temperature_2m_min[di],
+          snow: dl.snowfall_sum[di], precip: dl.precipitation_sum[di], stars: visStars(h, dl, di)
+        });
+        snow[R[i].id] = { y: s[0], t: s[1], m: s[2], d2: s[3], depth: dep == null ? null : dep * 100, elev: elev[i], w };
       });
       try { localStorage.setItem(SNOW_KEY, JSON.stringify({ t: Date.now(), d: snow })); } catch (e) { }
       afterSnow(Date.now());
@@ -72,7 +152,8 @@
   }
   function afterSnow(t) {
     const d = new Date(t);
-    $('#snowInfo').textContent = `Schnee: Open-Meteo, Stand ${d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`;
+    computePodium();
+    $('#snowInfo').textContent = `Wetter: Open-Meteo · Stand ${d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`;
     drawPins(); renderList();
     if (current) renderDetail(current);
   }
@@ -103,8 +184,9 @@
       ${ft > 0 ? `<polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${(ft * 100).toFixed(1)} 200"/>` : ''}
       ${sn && (sn.y > 30 || sn.t > 30) ? '<circle cx="0" cy="-30" r="3.2" style="fill:var(--snowY)"/>' : ''}`;
     const fav = isFav(r.id) ? '<polygon points="22,-31 24.4,-26 30,-25.4 25.8,-21.6 27,-16 22,-18.8 17,-16 18.2,-21.6 14,-25.4 19.6,-26" fill="#f2b01e" stroke="#fff" stroke-width="1"/>' : '';
-    return `<svg width="${size}" height="${size}" viewBox="-34 -34 68 68" aria-hidden="true">
-      <polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+    return `<svg width="${size}" height="${size}" viewBox="-35 -35 70 70" aria-hidden="true">
+      ${podium[r.id] ? `<polygon points="${hexPts(31)}" fill="none" style="stroke:${MEDAL[podium[r.id]]}" stroke-width="5" stroke-linejoin="round"/>` : ''}
+      <polygon points="${hexPts(30)}" style="fill:var(--card);stroke:${podium[r.id] ? MEDAL[podium[r.id]] : 'var(--ink)'}" stroke-width="1.6" stroke-linejoin="round"/>
       ${bars}
       <polygon points="${hexPts(r.noSki ? 18 : 13)}" fill="${color(r)}"/>
       ${fav}</svg>`;
@@ -132,30 +214,40 @@
     near: r => r.driveMin <= 60,
     snow: r => { const s = snow[r.id]; return !!s && ((s.y || 0) + (s.t || 0) >= 3 || (s.m || 0) >= 3); },
     fav: r => isFav(r.id),
-    big: r => sizeKm(r) >= 25
+    big: r => sizeKm(r) >= 25,
+    sunT: r => (starsOf(r.id, 0) ?? 0) >= 4,
+    sunM: r => (starsOf(r.id, 1) ?? 0) >= 4
   };
   const filtered = () => R.filter(r => S.filters.every(f => FILTERS[f](r)));
   function sorted(list) {
     const fresh = r => { const s = snow[r.id]; return s ? (s.y || 0) + (s.t || 0) : -1; };
+    const st = (r, d) => starsOf(r.id, d) ?? -1;
     return list.slice().sort((a, b) => S.sort === 'snow'
       ? (fresh(b) - fresh(a)) || ((snow[b.id]?.m || 0) - (snow[a.id]?.m || 0)) || a.driveMin - b.driveMin
-      : a.driveMin - b.driveMin);
+      : S.sort === 'wx'
+        ? (st(b, 0) - st(a, 0)) || (st(b, 1) - st(a, 1)) || a.driveMin - b.driveMin
+        : a.driveMin - b.driveMin);
   }
   function renderList() {
     const list = sorted(filtered());
     $('#listTitle').textContent = `${list.length} ${list.length === 1 ? 'Gebiet' : 'Gebiete'}`;
+    const top = Object.entries(podium).sort((a, b) => a[1] - b[1]);
+    $('#podium').innerHTML = top.length ? `<div class="podLbl">Tipp für morgen</div>` + top.map(([id, n]) =>
+      `<button data-id="${id}"><span class="medal" style="background:${MEDAL[n]}">${n}</span>${esc(byId[id].name)}</button>`).join('') : '';
+    $('#podium').hidden = !top.length;
     $('#list').innerHTML = list.length ? list.map(r => {
       const s = snow[r.id];
       const snowTxt = r.noSki ? '<span class="muted">Winterwandern</span>' : s
-        ? `<span class="yv">${Math.round((s.y || 0) + (s.t || 0))} cm</span> <span class="muted">neu</span><br><span class="muted">morgen ${Math.round(s.m || 0)} cm</span>`
+        ? `<span class="yv">${Math.round((s.y || 0) + (s.t || 0))} cm</span> <span class="muted">neu</span><br><span class="muted">morgen ${Math.round(s.m || 0)} cm</span><br><span class="muted">Sicht</span> ${starsOf(r.id, 0) != null ? num1(starsOf(r.id, 0)) + '<span class="sy">★</span>' : '–'}`
         : '<span class="muted">…</span>';
       return `<li data-id="${r.id}">
         <span class="mini">${pinSVG(r, 34)}</span>
-        <span class="t"><div class="n">${isFav(r.id) ? '★ ' : ''}${esc(r.name)}</div><div class="muted small num">${drive(r)} · ${eur(fuelCost(r))} Sprit</div></span>
+        <span class="t"><div class="n">${medalDot(r.id)}${isFav(r.id) ? '★ ' : ''}${esc(r.name)}</div><div class="muted small num">${drive(r)} · ${eur(fuelCost(r))} Sprit</div></span>
         <span class="s num">${snowTxt}</span></li>`;
     }).join('') : '<div class="empty">Kein Gebiet passt zu den Filtern.</div>';
   }
   $('#list').addEventListener('click', e => { const li = e.target.closest('li[data-id]'); if (li) openDetail(li.dataset.id, true); });
+  $('#podium').addEventListener('click', e => { const b = e.target.closest('button[data-id]'); if (b) openDetail(b.dataset.id, true); });
 
   /* ---------- 6) Detailansicht ---------- */
   let current = null;
@@ -200,6 +292,12 @@
         <div class="dTitle"><div class="h2">${esc(r.name)}</div><div class="muted small">${esc(r.area)} · ${sizeName(r)}</div></div>
         <button class="iconBtn star ${isFav(id) ? 'on' : ''}" data-act="fav" aria-label="Favorit"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
       </div>
+      <div class="metrics num">
+        ${r.noSki ? '' : `<div><span>Lifte offen</span><b>${liftsTxt(r)}</b></div>`}
+        <div><span>Sicht heute</span>${starsHTML(starsOf(id, 0))}</div>
+        <div><span>Sicht morgen</span>${starsHTML(starsOf(id, 1))}</div>
+      </div>
+      ${podium[id] ? `<p class="medalNote"><span class="medal" style="background:${MEDAL[podium[id]]}">${podium[id]}</span> ${MEDALNAME[podium[id]]} – Platz ${podium[id]} der besten Bedingungen für morgen (Wetter, Schnee, Panorama, Größe, Anfahrt)</p>` : ''}
       <div class="gallery">${gallery}</div>
       <div class="drive num"><b>${drive(r)}</b> ab Friedrichshafen · Sprit hin + zurück <b>${eur(fc)}</b></div>
       ${r.noSki ? '<p class="note">Seilbahn zum Winterwandern – kein Skigebiet, zählt nicht als Skitag.</p>' : `
@@ -210,6 +308,7 @@
         <div><b>${cm(s?.depth)}</b><span>Schneehöhe</span></div>
       </div>
       <p class="note">Wettermodell für ${s ? s.elev : '–'} m, nicht der offizielle Pistenbericht. Übermorgen: ${cm(s?.d2)}.</p>`}
+      ${wxHTML(r)}
       <div class="pano"><span><b>Panorama</b><br><span class="muted small">Tippen zum Ändern</span></span>
         <span class="mtns">${[1, 2, 3, 4, 5].map(i => `<button data-pano="${i}" aria-label="${i} von 5">${mtn(i <= pano)}</button>`).join('')}</span></div>
       <dl class="rows num">
@@ -220,6 +319,8 @@
       </dl>
       ${r.mapOnly ? '<p class="note">Nur auf der 3Täler-Karte gelistet – Pisten/Preis von skiresort.com.</p>' : ''}
       <div class="btnGrid">
+        <a class="btn" target="_blank" rel="noopener" href="${esc(r.web || r.link)}">${r.web && r.webKind === 'op' ? 'Website Skigebiet ↗' : 'Website (Ort) ↗'}</a>
+        <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/${encodeURIComponent('Parkplatz ' + r.name.replace(/\s*\(.*\)/, ''))}/@${r.lat},${r.lon},14z">Parken (Google Maps) ↗</a>
         <a class="btn" target="_blank" rel="noopener" href="https://maps.apple.com/?saddr=${home.lat},${home.lon}&daddr=${r.lat},${r.lon}&dirflg=d">Route (Apple)</a>
         <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${home.lat},${home.lon}&destination=${r.lat},${r.lon}&travelmode=driving">Route (Google)</a>
         <a class="btn" target="_blank" rel="noopener" href="${esc(r.link)}">Lifte & Pisten ↗</a>
@@ -228,6 +329,14 @@
       ${r.noSki ? '' : checkedToday
         ? `<button class="btn primary done wide" data-act="undoToday">✓ Heute eingecheckt · ${eur(checkedToday.price)}</button>`
         : `<button class="btn primary wide" data-act="checkin">Heute hier einchecken</button>`}`;
+  }
+  function wxHTML(r) {
+    const w = snow[r.id]?.w;
+    if (!w) return '';
+    const d = (x, i) => `<div class="wxDay"><div class="wxH">${dayName(x.date, i)}</div>${wIcon(x.code)}<div><b>${wLabel(x.code)}</b><div class="muted small num">${Math.round(x.tmin)}° / ${Math.round(x.tmax)}° · Schnee ${cm(x.snow)}</div><div class="small">Sicht ${starsHTML(x.stars)}</div></div></div>`;
+    return `<div class="secT">Wetter am Berg <span class="muted small">(${snow[r.id].elev} m)</span></div>
+      <div class="wxTwo">${d(w[0], 0)}${d(w[1], 1)}</div>
+      <div class="wx7 num">${w.slice(0, 7).map((x, i) => `<div><span class="small">${dayName(x.date, i)}</span>${wIcon(x.code)}<b>${Math.round(x.tmax)}°</b><span class="muted small">${Math.round(x.tmin)}°</span><span class="small">${num1(x.stars)}<span class="sy">★</span></span></div>`).join('')}</div>`;
   }
   $('#detailView').addEventListener('click', e => {
     const b = e.target.closest('[data-act],[data-pano]');
