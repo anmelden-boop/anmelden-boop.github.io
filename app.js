@@ -886,6 +886,69 @@
     }, () => toast('Standort nicht freigegeben'), { enableHighAccuracy: true, timeout: 10000 });
   };
 
+
+  /* ---------- Begrüßungs-Banner: Spruch + Finanzierungsfortschritt, 10 s beim Öffnen ---------- */
+  const QKEY = 'dreitaeler-quotes', HELLO_MS = 10000;
+  const eur0 = v => Math.round(v).toLocaleString('de-DE') + ' €';
+  function quoteVals() {
+    const b = balance(), pass = S.settings.pass || 0, f = pass ? b.value / pass : 0, minus = b.saved < 0;
+    const ski = R.filter(r => !r.noSki && priceOf(r) != null);
+    const avg = b.days ? b.value / b.days : (ski.reduce((a, r) => a + priceOf(r), 0) / (ski.length || 1));
+    const best = R.filter(r => !r.noSki && snow[r.id]).sort((a, c) => (snow[c.id].t || 0) - (snow[a.id].t || 0))[0];
+    const cm = best ? Math.round(snow[best.id].t || 0) : 0;
+    return {
+      offen: minus ? eur0(-b.saved) : null,
+      tageNoch: minus ? String(Math.max(1, Math.ceil(-b.saved / (avg || 60)))) : null,
+      skitage: minus && b.days >= 1 && b.days <= 5 ? `${b.days} Skitag${b.days === 1 ? '' : 'e'}` : null,
+      prozent: f < 1 ? String(Math.round(f * 100)) : null,
+      tagespreis: avg ? eur0(avg) : null,
+      gebiet: cm >= 5 ? best.name : null, cm: cm >= 5 ? String(cm) : null
+    };
+  }
+  function pickQuote() {
+    const Q = window.QUOTES || []; if (!Q.length) return null;
+    const V = quoteVals();
+    const fill = q => { let ok = true; const t = q.replace(/\{(\w+)\}/g, (m, k) => { if (V[k] == null) ok = false; return V[k] ?? ''; }); return ok ? t : null; };
+    let recent = []; try { recent = JSON.parse(localStorage.getItem(QKEY) || '[]'); } catch (e) { }
+    const all = Q.map((q, i) => [i, fill(q)]).filter(x => x[1]);
+    const pool = all.filter(x => !recent.includes(x[0]));
+    const [i, t] = (pool.length ? pool : all)[Math.floor(Math.random() * (pool.length || all.length))];
+    recent = [i, ...recent].slice(0, Math.floor(Q.length * 0.7)); // ca. 70 % der Sprüche müssen erst durch sein, bevor einer wiederkommt
+    try { localStorage.setItem(QKEY, JSON.stringify(recent)); } catch (e) { }
+    return t;
+  }
+  let helloTimer = null;
+  function closeHello() {
+    const el = document.getElementById('hello'); clearTimeout(helloTimer); if (!el) return;
+    el.classList.remove('in'); setTimeout(() => el.remove(), 320);
+  }
+  function showHello() {
+    const q = pickQuote(); if (!q) return;
+    document.getElementById('hello')?.remove();
+    const b = balance(), pass = S.settings.pass || 0, f = pass ? Math.max(0, Math.min(1, b.value / pass)) : 0, done = f >= 1;
+    const el = document.createElement('div'); el.id = 'hello'; el.setAttribute('role', 'status');
+    el.innerHTML = `
+      <button class="hX" aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="hQ">${esc(q)}</div>
+      <div class="hBar ${done ? 'done' : ''}"><i class="hR"></i></div>
+      <div class="hSub num">${done
+        ? `<span>✓ Pass bezahlt</span><span>+${eur0(b.saved)} gespart</span>`
+        : `<span>${Math.round(f * 100)} % abgefahren</span><span>noch ${eur0(-b.saved)} offen</span>`}</div>
+      <i class="hTime"></i>`;
+    document.body.appendChild(el);
+    el.querySelector('.hX').onclick = e => { e.stopPropagation(); closeHello(); };
+    el.onclick = () => { closeHello(); openWallet(); };
+    let y0 = null;
+    el.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+    el.addEventListener('touchmove', e => { if (y0 != null && e.touches[0].clientY - y0 < -25) { y0 = null; closeHello(); } }, { passive: true });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.classList.add('in');
+      // grüner Balken = Passpreis; Rot frisst ihn von rechts bis auf den abgefahrenen Anteil auf
+      setTimeout(() => { const r = el.querySelector('.hR'); if (r) r.style.width = `${((1 - f) * 100).toFixed(1)}%`; }, 600);
+    }));
+    helloTimer = setTimeout(closeHello, HELLO_MS);
+  }
+
   // Start
   drawPins();
   renderList();
@@ -895,5 +958,11 @@
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   // Neue Einführung (TOUR_V erhöhen) wird jedem einmal gezeigt – auch wer die App schon nutzt
   passBtn();
-  if (!S.home) openHome(true); else if ((S.tourV || 0) < TOUR_V) openTour();
+  if (!S.home) openHome(true); else if ((S.tourV || 0) < TOUR_V) openTour(); else setTimeout(showHello, 500);
+  // Banner auch, wenn die App nach mindestens 30 Minuten im Hintergrund wieder geöffnet wird
+  let hiddenAt = 0;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenAt = Date.now(); closeHello(); }
+    else if (hiddenAt && Date.now() - hiddenAt >= 30 * 60 * 1000 && $('#modalWrap').hidden) setTimeout(showHello, 400);
+  });
 })();
