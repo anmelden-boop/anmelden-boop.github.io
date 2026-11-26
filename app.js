@@ -625,9 +625,11 @@
       try {
         const j = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=de`)).json();
         const res = (j.results || []).filter(x => ['DE', 'AT', 'CH', 'LI', 'IT', 'FR'].includes(x.country_code));
-        $('#hmMsg').textContent = res.length ? 'Bitte auswählen:' : 'Nichts gefunden – anders schreiben?';
-        $('#hmRes').innerHTML = res.map((x, i) => `<li><button class="btn wide" data-i="${i}">${esc(x.name)}<span class="muted small">&nbsp;· ${esc([x.admin1, x.country].filter(Boolean).join(', '))}</span></button></li>`).join('');
-        $('#hmRes').querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const x = res[+b.dataset.i]; pick(x.name, x.latitude, x.longitude); });
+        if (!res.length) { $('#hmMsg').textContent = 'Nichts gefunden – anders schreiben?'; return; }
+        // Automatisch den obersten Vorschlag nehmen – keine Auswahl nötig
+        const x = res[0];
+        $('#hmRes').innerHTML = `<li class="muted small">Gefunden: <b>${esc(x.name)}</b> · ${esc([x.admin1, x.country].filter(Boolean).join(', '))}</li>`;
+        pick(x.name, x.latitude, x.longitude);
       } catch (e) { $('#hmMsg').textContent = 'Ortssuche gerade nicht erreichbar.'; }
     };
     $('#hmQ').onkeydown = e => { if (e.key === 'Enter') $('#hmGo').click(); };
@@ -635,12 +637,19 @@
   // Kurze Einführung beim ersten Öffnen (zum Durchklicken, ca. 1 Minute)
   function openTour(start) {
     const pin = (fill, y, t, ring) => `<svg width="64" height="64" viewBox="-39 -39 78 78" aria-hidden="true">${ring ? `<polygon points="${hexPts(33)}" fill="none" stroke="${ring}" stroke-width="8" stroke-linejoin="round"/>` : ''}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/><polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${y} 200"/><polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${t} 200"/><polygon points="${hexPts(13)}" fill="${fill}"/></svg>`;
+    const K = matchMedia('(prefers-color-scheme: dark)').matches ? ['Weiß', 'weiß'] : ['Schwarz', 'schwarz']; // Balkenfarbe „gestern“ folgt dem Hell-/Dunkelmodus
     const steps = [
       ['Willkommen 👋', `<p>Die Karte zeigt alle <b>38 Gebiete</b> deines 3TälerPass. Unten ist die <b>Liste</b> – nach oben ziehen zum Aufklappen.</p><p><b>Pin oder Listeneintrag antippen</b> öffnet das Gebiet mit Fotos, Webcams, Wetter und Parkplätzen.</p>`],
-      ['So liest du einen Pin', `<div class="tPin">${pin('#2f7fd8', 40, 80)}<div><p><b>Links schwarz:</b> Neuschnee gestern<br><b>Rechts grün:</b> Neuschnee heute<br>Voller Balken = 30 cm</p></div></div><p class="tLeg"><span style="background:#2f7fd8"></span>groß ≥ 25 km <span style="background:#ef9f27"></span>mittel <span style="background:#e0483e"></span>klein &lt; 8 km <span style="background:#9a9a9a"></span>Karren</p><p class="muted small">Farbe innen = Größe des Gebiets.</p>`],
+      ['So liest du einen Pin', `<p class="tIntro">Jeder Pin zeigt <b>Größe</b> und <b>Neuschnee</b> auf einen Blick:</p>
+        <div class="tEx">
+          <div class="tCard">${pin('#2f7fd8', 15, 90)}<b>Beispiel A</b><span><i class="dot" style="background:#2f7fd8"></i>Blau = großes Gebiet</span><span>wenig <b>${K[0]}</b>: gestern ca. 4 cm</span><span>viel <b class="g">Grün</b>: heute ca. 27 cm</span><em>→ großes Gebiet, frischer Pulver</em></div>
+          <div class="tCard">${pin('#e0483e', 85, 12)}<b>Beispiel B</b><span><i class="dot" style="background:#e0483e"></i>Rot = kleines Gebiet</span><span>viel <b>${K[0]}</b>: gestern ca. 25 cm</span><span>wenig <b class="g">Grün</b>: heute ca. 4 cm</span><em>→ kleines Gebiet, Schnee von gestern</em></div>
+        </div>
+        <p class="tRule"><b>Linker Rand ${K[1]}</b> = Neuschnee gestern · <b class="g">rechter Rand grün</b> = Neuschnee heute · je voller der Rand, desto mehr – <b>ganz voll = 30 cm</b> oder mehr.</p>
+        <p class="tLeg"><b>Farbe innen = Größe:</b> <span style="background:#2f7fd8"></span>groß ≥ 25 km <span style="background:#ef9f27"></span>mittel 8–25 km <span style="background:#e0483e"></span>klein &lt; 8 km <span style="background:#9a9a9a"></span>Karren</p>`],
       ['Gold, Silber, Bronze', `<div class="tPin">${pin('#2f7fd8', 30, 60, MEDAL[1])}${pin('#ef9f27', 20, 40, MEDAL[2])}${pin('#2f7fd8', 10, 50, MEDAL[3])}</div><p>Die drei Gebiete mit den <b>besten Bedingungen für morgen</b> bekommen einen farbigen Rahmen – aus Wetter, Schnee, Panorama, Pistengröße, offenen Liften und (wenig) Anfahrt.</p>`],
       ['Ein Gebiet im Detail', `<p>Oben vier Kacheln: <b>Fahrtzeit</b> ab deinem Wohnort, <b>offene Lifte</b> (live von 3Täler) und die <b>Sicht</b> heute und morgen in Sternen – 5 Sterne heißt Sonne ohne Wolken.</p><p>Darunter Wetter für 7 Tage, <b>Parkplätze</b> mit Link zu Google Maps und die Website des Gebiets.</p>`],
-      ['Einchecken lohnt sich', `<p>Tippe im Gebiet auf <b>„Heute hier einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
+      ['Einchecken lohnt sich', `<p>Tippe im Gebiet unten auf <b>„Einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
       ['Filtern & Würfeln', `<p>Oben die <b>Filter</b>: ≤ 1 h Fahrt, Neuschnee, Favoriten, große Gebiete und gute Sicht heute oder morgen – kombinierbar.</p><p>Die Liste sortierst du nach <b>Fahrtzeit, Neuschnee oder Pisten-km</b>. Der <b>Würfel</b> lost ein Gebiet aus.</p>`],
       ['Deine Daten', `<p>Favoriten, Skitage und Einstellungen liegen <b>nur auf diesem Gerät</b> – kein Konto, nichts wird hochgeladen.</p><p>Tipp: Über Teilen → <b>„Zum Home-Bildschirm“</b> als App speichern und ab und zu in der Bilanz eine <b>Sicherung</b> machen.</p>`],
       ['Bitte beachten', `<p><b>Keine offizielle Software.</b> Diese App ist ein privates Projekt und steht in keiner Verbindung zum 3TälerPass oder zu den Liftbetreibern.</p><p>Alle Angaben (Schnee, Wetter, Lifte, Preise, Fahrtzeiten, Parkplätze) ohne Gewähr – maßgeblich sind die offiziellen Seiten. <b>Es wird keine Haftung übernommen.</b></p><p>Nutzung nur <b>privat und nicht kommerziell</b>. Kopieren, Weitergeben des Codes oder Nachbauen ist nicht erlaubt.</p>`]
