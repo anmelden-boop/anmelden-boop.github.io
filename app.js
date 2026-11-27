@@ -1,6 +1,6 @@
 /* 3Täler Karte – App-Logik
    Aufbau: 1) Speicher  2) Rechnen & Formatieren  3) Schneedaten  4) Karte & Pins
-           5) Liste  6) Detailansicht  7) Check-in & Bilanz  8) Auslosen  9) Bedienung (Blatt, Filter, Standort)
+           5) Liste  6) Detailansicht  7) Check-in & Bilanz  8) Bedienung (Blatt, Filter, Standort)
 */
 (function () {
   'use strict';
@@ -22,7 +22,8 @@
   try { S = Object.assign(structuredClone(DEFAULT), JSON.parse(localStorage.getItem(KEY) || '{}')); }
   catch (e) { S = structuredClone(DEFAULT); }
   S.settings = Object.assign({}, DEFAULT.settings, S.settings);
-  if (!['time', 'snow', 'km'].includes(S.sort)) S.sort = 'time';
+  if (S.sort === 'km') S.sort = 'rec'; // früher „Pisten-km“
+  if (!['time', 'snow', 'rec'].includes(S.sort)) S.sort = 'time';
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Speichern nicht möglich'); } if (typeof passBtn === 'function') passBtn(); };
 
   /* ---------- 2) Rechnen & Formatieren ---------- */
@@ -38,7 +39,8 @@
   const panoOf = r => r.pano; // fest vorgegeben, nicht änderbar
   const isFav = id => S.favs.includes(id);
   const sizeKm = r => (r.km > 0 ? r.km : (r.routes || 0));
-  const color = r => r.noSki ? '#9a9a9a' : sizeKm(r) >= 25 ? '#2f7fd8' : sizeKm(r) >= 8 ? '#ef9f27' : '#e0483e';
+  const BIG = '#2e9a4f'; // große Gebiete (grün); Neuschnee heute ist blau
+  const color = r => r.noSki ? '#9a9a9a' : sizeKm(r) >= 25 ? BIG : sizeKm(r) >= 8 ? '#ef9f27' : '#e0483e';
   const sizeName = r => r.noSki ? 'Seilbahn' : sizeKm(r) >= 25 ? 'groß' : sizeKm(r) >= 8 ? 'mittel' : 'klein';
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
   const cm = v => (v == null ? '–' : `${Math.round(v)} cm`);
@@ -85,6 +87,8 @@
     let sc = parts.reduce((a, p) => a + p[0] * p[1], 0) / wsum;
     if (s.depth != null && s.depth < 15 && fresh < 10) sc *= 0.5; // zu wenig Schnee
     if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
+    if (r.season) { const d = new Date(); d.setDate(d.getDate() + 1); const tm = d.toLocaleDateString('sv-SE'); if (tm < r.season[0] || tm > r.season[1]) sc *= 0.15; } // morgen außerhalb der Saison
+    else sc *= L && L.st && L.st !== 'open' ? 0.15 : 0.7;          // kein fester Termin: Liftstatus „geschlossen“ zählt wie außerhalb der Saison
     return sc;
   }
   /* Abruf-Intervalle: jede Quelle nur so oft wie nötig, nie öfter als alle 30 Minuten (kein manuelles Neuladen).
@@ -230,16 +234,53 @@
   }
 
   /* ---------- 4) Karte & Pins ---------- */
-  const map = L.map('map', { zoomControl: false, attributionControl: true, maxZoom: 17, minZoom: 7 });
-  L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-    maxZoom: 17,
-    attribution: 'Karte: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA), © OpenStreetMap · Schnee: Open-Meteo'
-  }).addTo(map);
-  let pinsReady = false;
+  // Karte: OpenFreeMap (Vektor, ohne Limit/Schlüssel) + Relief aus AWS Terrain Tiles; eigener Stil ohne Straßen.
+  // Tag = Hell-Beige, Nacht (Dunkelmodus) = Dunkles Beige – wechselt automatisch mit dem iPhone.
+  const PAL = {
+    light: { bg: '#f1e9da', wood: '#e6dcc6', woodO: .6, rock: '#e9e1d2', water: '#c5d0cf', shadow: '#7d6a4d', hi: '#fffaf0', ex: .55, border: '#b6a68a', label: '#6d5e47' },
+    dark: { bg: '#2c2822', wood: '#332e27', woodO: .8, rock: '#36312a', water: '#1d2326', shadow: '#0b0a08', hi: '#5a4f40', ex: .7, border: '#6c6150', label: '#c8b99e' }
+  };
+  const mapStyle = dark => {
+    const C = dark ? PAL.dark : PAL.light;
+    return {
+      version: 8, glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+      sources: {
+        o: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '<a href="https://openfreemap.org">OpenFreeMap</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' },
+        dem: { type: 'raster-dem', tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], encoding: 'terrarium', tileSize: 256, maxzoom: 12, attribution: 'Relief: Mapzen/AWS · Schnee: Open-Meteo' }
+      },
+      layers: [
+        { id: 'bg', type: 'background', paint: { 'background-color': C.bg } },
+        { id: 'wood', type: 'fill', source: 'o', 'source-layer': 'landcover', filter: ['==', ['get', 'class'], 'wood'], paint: { 'fill-color': C.wood, 'fill-opacity': C.woodO } },
+        { id: 'rock', type: 'fill', source: 'o', 'source-layer': 'landcover', filter: ['in', ['get', 'class'], ['literal', ['ice', 'rock']]], paint: { 'fill-color': C.rock, 'fill-opacity': .5 } },
+        { id: 'hs', type: 'hillshade', source: 'dem', paint: { 'hillshade-shadow-color': C.shadow, 'hillshade-highlight-color': C.hi, 'hillshade-accent-color': C.shadow, 'hillshade-exaggeration': C.ex, 'hillshade-illumination-direction': 315 } },
+        { id: 'water', type: 'fill', source: 'o', 'source-layer': 'water', paint: { 'fill-color': C.water } },
+        { id: 'river', type: 'line', source: 'o', 'source-layer': 'waterway', filter: ['==', ['get', 'class'], 'river'], paint: { 'line-color': C.water, 'line-width': 1.2 } },
+        { id: 'border', type: 'line', source: 'o', 'source-layer': 'boundary', filter: ['all', ['==', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]], paint: { 'line-color': C.border, 'line-width': 1.3, 'line-dasharray': [3, 2] } },
+        { id: 'place', type: 'symbol', source: 'o', 'source-layer': 'place', filter: ['in', ['get', 'class'], ['literal', ['city', 'town']]], layout: { 'text-field': ['get', 'name'], 'text-font': ['Noto Sans Regular'], 'text-size': ['match', ['get', 'class'], 'city', 13, 11], 'text-letter-spacing': .04 }, paint: { 'text-color': C.label, 'text-halo-color': C.bg, 'text-halo-width': 1.4 } },
+        { id: 'peak', type: 'symbol', source: 'o', 'source-layer': 'mountain_peak', minzoom: 9, filter: ['>=', ['to-number', ['get', 'ele']], 2000], layout: { 'text-field': ['concat', '▲ ', ['get', 'name']], 'text-font': ['Noto Sans Italic'], 'text-size': 9.5, 'text-optional': true }, paint: { 'text-color': C.label, 'text-opacity': .75, 'text-halo-color': C.bg, 'text-halo-width': 1 } }
+      ]
+    };
+  };
+  const darkMQ = matchMedia('(prefers-color-scheme: dark)');
   let home = homeOf();
-  const homeMarker = L.marker([home.lat, home.lon], { icon: L.divIcon({ className: '', html: '<div class="home-dot"></div>', iconSize: [16, 16] }), interactive: false }).addTo(map);
-  map.fitBounds(L.latLngBounds(R.map(r => [r.lat, r.lon]).concat([[home.lat, home.lon]])), { paddingTopLeft: [20, 70], paddingBottomRight: [20, 170] });
-  map.on('zoomend', () => { map.getContainer().classList.toggle('show-labels', map.getZoom() >= 11); if (pinsReady) drawPins(); });
+  const allBounds = new maplibregl.LngLatBounds();
+  R.forEach(r => allBounds.extend([r.lon, r.lat])); allBounds.extend([home.lon, home.lat]);
+  const map = new maplibregl.Map({
+    container: 'map', style: mapStyle(darkMQ.matches), bounds: allBounds,
+    fitBoundsOptions: { padding: { top: 70, left: 20, right: 20, bottom: 170 } },
+    minZoom: 6, maxZoom: 16, dragRotate: false, pitchWithRotate: false, touchPitch: false,
+    attributionControl: false, fadeDuration: 0
+  });
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'top-right');
+  map.once('load', () => document.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show')); // Quellen nur auf Tippen (i)
+  darkMQ.addEventListener?.('change', e => map.setStyle(mapStyle(e.matches)));
+  const dot = (cls, lat, lon) => { const el = document.createElement('div'); el.className = cls; return new maplibregl.Marker({ element: el }).setLngLat([lon, lat]).addTo(map); };
+  // Luftlinie in Metern
+  const distM = (a, b) => { const k = Math.PI / 180, dLa = (b[0] - a[0]) * k, dLo = (b[1] - a[1]) * k; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * k) * Math.cos(b[0] * k) * Math.sin(dLo / 2) ** 2; return 12742000 * Math.asin(Math.sqrt(h)); };
+  let pinsReady = false;
+  const homeMarker = dot('home-dot', home.lat, home.lon);
+  map.on('zoomend', () => { map.getContainer().classList.toggle('show-labels', map.getZoom() >= 10); if (pinsReady) drawPins(); });
 
   // Sechseck-Punkte, Spitze oben
   const hexPts = rad => [0, 1, 2, 3, 4, 5].map(i => { const a = Math.PI / 3 * i - Math.PI / 2; return `${(rad * Math.cos(a)).toFixed(2)},${(rad * Math.sin(a)).toFixed(2)}`; }).join(' ');
@@ -267,36 +308,42 @@
   function drawPins() {
     const vis = new Set(filtered().map(r => r.id));
     const z = map.getZoom();
-    const sz = z <= 8 ? 26 : z === 9 ? 32 : z === 10 ? 40 : 48; // rausgezoomt kleinere Pins, damit sie nicht übereinander liegen
+    const sz = z < 7.5 ? 26 : z < 8.5 ? 32 : z < 9.5 ? 40 : 48; // rausgezoomt kleinere Pins, damit sie nicht übereinander liegen
     R.forEach(r => {
-      const icon = L.divIcon({ className: 'pin' + (vis.has(r.id) ? '' : ' dim'), html: pinSVG(r, sz), iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2] });
-      if (markers[r.id]) { markers[r.id].setIcon(icon); markers[r.id].setZIndexOffset(vis.has(r.id) ? 100 : 0); }
-      else {
-        markers[r.id] = L.marker([r.lat, r.lon], { icon, keyboard: false })
-          .bindTooltip(esc(r.name), { permanent: true, direction: 'bottom', offset: [0, 20], className: 'lbl' })
-          .on('click', () => openDetail(r.id, true))
-          .addTo(map);
+      let m = markers[r.id];
+      if (!m) {
+        const el = document.createElement('div'); el.className = 'pin';
+        el.addEventListener('click', e => { e.stopPropagation(); openDetail(r.id, true); });
+        m = markers[r.id] = new maplibregl.Marker({ element: el }).setLngLat([r.lon, r.lat]).addTo(map);
       }
+      const el = m.getElement();
+      el.classList.toggle('dim', !vis.has(r.id));
+      el.style.zIndex = vis.has(r.id) ? (podium[r.id] ? 3 : 2) : 1;
+      el.style.width = el.style.height = sz + 'px';
+      el.innerHTML = `<div class="pw">${pinSVG(r, sz)}<span class="lbl">${esc(r.name)}</span></div>`;
     });
   }
 
   /* ---------- 5) Liste ---------- */
   const FILTERS = {
-    near: r => driveMin(r) <= 60,
     snow: r => { const s = snow[r.id]; return !!s && ((s.y || 0) + (s.t || 0) >= 3 || (s.m || 0) >= 3); },
     fav: r => isFav(r.id),
     big: r => sizeKm(r) >= 25,
     sunT: r => (starsOf(r.id, 0) ?? 0) >= 4,
     sunM: r => (starsOf(r.id, 1) ?? 0) >= 4
   };
+  S.filters = (S.filters || []).filter(f => f in FILTERS); // entfernte Filter (z. B. „≤ 1 h Fahrt“) aus alten Daten ignorieren
   const filtered = () => R.filter(r => S.filters.every(f => FILTERS[f](r)));
+  // Empfohlen: dieselbe Bewertung wie „Tipp für morgen“, für alle Gebiete; Rang 1–n über alle Gebiete (unabhängig vom Filter)
+  const recScore = r => scoreTomorrow(r);
+  const recRank = () => { const ok = R.filter(r => recScore(r) != null).sort((a, b) => recScore(b) - recScore(a) || driveMin(a) - driveMin(b)); return Object.fromEntries(ok.map((r, i) => [r.id, i + 1])); };
   function sorted(list) {
     const fresh = r => { const s = snow[r.id]; return s ? (s.y || 0) + (s.t || 0) : -1; };
     const st = (r, d) => starsOf(r.id, d) ?? -1;
     return list.slice().sort((a, b) => S.sort === 'snow'
       ? (fresh(b) - fresh(a)) || ((snow[b.id]?.m || 0) - (snow[a.id]?.m || 0)) || driveMin(a) - driveMin(b)
-      : S.sort === 'km'
-        ? (sizeKm(b) - sizeKm(a)) || driveMin(a) - driveMin(b)
+      : S.sort === 'rec'
+        ? ((recScore(b) ?? -1) - (recScore(a) ?? -1)) || driveMin(a) - driveMin(b)
         : driveMin(a) - driveMin(b));
   }
   function renderList() {
@@ -306,6 +353,7 @@
     $('#podium').innerHTML = top.length ? `<div class="podLbl">Tipp für morgen</div>` + top.map(([id, n]) =>
       `<button data-id="${id}"><span class="medal" style="background:${MEDAL[n]}">${n}</span>${esc(byId[id].name)}</button>`).join('') : '';
     $('#podium').hidden = !top.length;
+    const rank = S.sort === 'rec' ? recRank() : null;
     $('#list').innerHTML = list.length ? list.map(r => {
       const s = snow[r.id];
       const snowTxt = r.noSki ? '<span class="muted">Winterwandern</span>' : s
@@ -313,7 +361,7 @@
         : '<span class="muted">…</span>';
       return `<li data-id="${r.id}">
         <span class="mini">${pinSVG(r, 34)}</span>
-        <span class="t"><div class="n">${medalDot(r.id)}${isFav(r.id) ? '★ ' : ''}${esc(r.name)}</div><div class="muted small num">${drive(r)} · ${eur(fuelCost(r))} Sprit</div></span>
+        <span class="t"><div class="n">${rank ? `<span class="rk${rank[r.id] <= 3 ? ' top' : ''}"${rank[r.id] <= 3 ? ` style="background:${MEDAL[rank[r.id]]}"` : ''}>${rank[r.id] ?? '–'}</span>` : medalDot(r.id)}${isFav(r.id) ? '★ ' : ''}${esc(r.name)}</div><div class="muted small num">${drive(r)} · ${eur(fuelCost(r))} Sprit</div></span>
         <span class="s num">${snowTxt}</span></li>`;
     }).join('') : '<div class="empty">Kein Gebiet passt zu den Filtern.</div>';
   }
@@ -331,10 +379,8 @@
     $('#sheetBody').scrollTop = 0;
     setSheet('detail');
     if (fly) {
-      const z = Math.max(map.getZoom(), 11);
-      const p = map.project([r.lat, r.lon], z);
-      p.y += sheetVisible() / 2 - 20; // Pin über dem Blatt anzeigen
-      map.flyTo(map.unproject(p, z), z, { duration: .6 });
+      const z = Math.max(map.getZoom(), 10);
+      map.flyTo({ center: [r.lon, r.lat], zoom: z, offset: [0, -(sheetVisible() / 2 - 20)], duration: 600 }); // Pin über dem Blatt anzeigen
     }
   }
   function closeDetail() {
@@ -346,10 +392,25 @@
     if (sheet.dataset.state === 'detail') setSheet('half');
   }
   const mtn = on => `<svg viewBox="0 0 30 22"><path d="M1 21 L11 5 L16 12 L20 7 L29 21 Z" style="fill:${on ? 'var(--ink)' : 'none'};stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round" opacity="${on ? 1 : .35}"/>${on ? '<path d="M8.6 9 L11 5 L13.4 9 L11.8 8 L11 9.2 L10.2 8 Z" style="fill:var(--card)"/>' : ''}</svg>`;
+  // Saison-Punkt: grün = Saison läuft, rot = noch nicht / nicht mehr geöffnet (Termine 3TälerPass 2026/27)
+  const fmtD = iso => new Date(iso + 'T12:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  function seasonState(r) {
+    const t = today();
+    if (r.season) return t >= r.season[0] && t <= r.season[1] ? 'on' : 'off';
+    const L = lifts[r.id]; if (L && (L.st === 'open' || L.open > 0)) return 'on';
+    return 'snow';
+  }
+  function seasonDot(r) {
+    const st = seasonState(r);
+    const txt = r.noSki && st === 'on' ? 'Ganzjährig in Betrieb'
+      : r.season ? `${st === 'on' ? 'Saison läuft' : 'Geschlossen'} · Saison ${fmtD(r.season[0])} – ${fmtD(r.season[1])}`
+      : st === 'on' ? 'Laut 3TälerPass geöffnet' : 'Kein fester Saisontermin – Betrieb je nach Schneelage';
+    return `<span class="sDot ${st}" role="img" aria-label="${txt}" title="${txt}"></span>`;
+  }
   function renderDetail(id) {
     const r = byId[id], s = snow[id], pano = panoOf(r);
     // Reihenfolge: 1) Titelbild (Panorama/Piste, Betreiber) 2) Live-Webcams 3) weitere Schneebilder
-    const photo = (p, first) => `<div class="gItem"><img ${first ? 'fetchpriority="high"' : 'loading="lazy"'} alt="${esc(r.name)}" src="${esc(p.u)}" onerror="this.parentNode.remove()"><span class="cap">Foto: ${esc(p.c)}</span></div>`;
+    const photo = (p, first) => `<div class="gItem"><img ${first ? 'fetchpriority="high"' : 'loading="lazy"'} alt="${esc(r.name)}" src="${esc(p.u)}" onerror="this.parentNode.remove()">${p.l ? `<a class="cap" href="${esc(p.l)}" target="_blank" rel="noopener">Foto: ${esc(p.c)} ↗</a>` : `<span class="cap">Foto: ${esc(p.c)}</span>`}</div>`;
     const ph = r.photos || [];
     const hero = ph.length ? photo(ph[0], true) : '';
     const cams = r.cams.map(c => `<div class="gItem"><img loading="lazy" alt="Webcam ${esc(c.t)}" src="${esc(c.u + (c.u.includes('?') ? '&' : '?') + '_=' + Math.floor(Date.now() / 6e5))}" onerror="this.parentNode.classList.add('noimg');this.parentNode.innerHTML='Webcam ${esc(c.t)} gerade nicht verfügbar'"><span class="cap"><span class="live"></span>Webcam · ${esc(c.t)}</span></div>`).join('');
@@ -363,7 +424,7 @@
     $('#detailView').innerHTML = `
       <div class="dHead">
         <button class="iconBtn" data-act="back" aria-label="Zurück zur Liste"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-        <div class="dTitle"><div class="h2">${esc(r.name)}</div><div class="muted small">${esc(r.area)} · ${sizeName(r)}</div></div>
+        <div class="dTitle"><div class="h2">${esc(r.name)} ${seasonDot(r)}</div><div class="muted small">${esc(r.area)} · ${sizeName(r)}</div></div>
         <button class="iconBtn star ${isFav(id) ? 'on' : ''}" data-act="fav" aria-label="Favorit"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
       </div>
       <div class="metrics num">
@@ -609,45 +670,6 @@
     };
   }
 
-  /* ---------- 8) Auslosen ---------- */
-  function openDice() {
-    const o = JSON.parse(localStorage.getItem('dreitaeler-dice') || '{"fav":false,"max":"0","snow":false,"big":false}');
-    modal(`
-      <div class="mHead"><div class="h2">Skigebiet auslosen</div><button class="iconBtn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-      <div class="opts">
-        <label>Nur Favoriten <input type="checkbox" id="dFav" ${o.fav ? 'checked' : ''}></label>
-        <label>Nur mit Neuschnee <input type="checkbox" id="dSnow" ${o.snow ? 'checked' : ''}></label>
-        <label>Nur große/mittlere (≥ 8 km) <input type="checkbox" id="dBig" ${o.big ? 'checked' : ''}></label>
-        <label>Maximale Fahrtzeit
-          <select id="dMax"><option value="0">egal</option><option value="60">1 h</option><option value="80">1:20 h</option><option value="100">1:40 h</option></select></label>
-      </div>
-      <div class="result" id="dRes"><span class="muted">Tippe auf „Würfeln“</span></div>
-      <button class="btn primary wide" id="dGo">Würfeln</button>`, 'dice');
-    $('#dMax').value = o.max;
-    $('#dGo').onclick = () => {
-      const opt = { fav: $('#dFav').checked, snow: $('#dSnow').checked, big: $('#dBig').checked, max: $('#dMax').value };
-      localStorage.setItem('dreitaeler-dice', JSON.stringify(opt));
-      const pool = R.filter(r => !r.noSki && (!opt.fav || isFav(r.id)) && (!opt.snow || FILTERS.snow(r)) && (!opt.big || sizeKm(r) >= 8) && (opt.max === '0' || driveMin(r) <= +opt.max));
-      if (!pool.length) { $('#dRes').innerHTML = '<span class="muted">Kein Gebiet passt zu diesen Bedingungen.</span>'; return; }
-      const pick = pool[Math.floor(Math.random() * pool.length)];
-      let n = 0;
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const spin = setInterval(() => {
-        const t = pool[Math.floor(Math.random() * pool.length)];
-        $('#dRes').innerHTML = `<div class="rn">${esc(t.name)}</div>`;
-        if (++n > (reduce ? 0 : 12)) { clearInterval(spin); showPick(pick); }
-      }, 70);
-    };
-    function showPick(r) {
-      const s = snow[r.id];
-      $('#dRes').innerHTML = `<div class="rn">${esc(r.name)}</div>
-        <div class="num">${drive(r)} · Sprit ${eur(fuelCost(r))}</div>
-        <div class="muted small num">${s ? `Neuschnee gestern ${cm(s.y)} · heute ${cm(s.t)}` : ''} · Panorama ${panoOf(r)}/5</div>
-        <button class="btn" style="margin-top:8px" id="dShow">Anzeigen</button>`;
-      $('#dShow').onclick = () => { closeModal(); openDetail(r.id, true); };
-    }
-  }
-
   /* ---------- 9) Bedienung ---------- */
   // Dialoge
   function openHome(first) {
@@ -672,7 +694,7 @@
           R.forEach((r, i) => { const du = j.durations[0][i + 1], di = j.distances[0][i + 1]; if (du != null && di != null) t[r.id] = [Math.round(di / 100) / 10, Math.round(du / 60)]; });
           S.home = { name, lat, lon, t };
         }
-        save(); home = homeOf(); homeMarker.setLatLng([home.lat, home.lon]);
+        save(); home = homeOf(); homeMarker.setLngLat([home.lon, home.lat]);
         closeModal(); drawPins(); renderList(); computePodium(); if (current) renderDetail(current);
         if (first && (S.tourV || 0) < TOUR_V) openTour(); else toast(`Fahrtzeiten ab ${name}`);
       } catch (e) { $('#hmMsg').textContent = 'Routenberechnung gerade nicht erreichbar – bitte später nochmal.'; }
@@ -698,7 +720,7 @@
     const pin = (fill, y, t, ring) => `<svg width="64" height="64" viewBox="-39 -39 78 78" aria-hidden="true">${ring ? `<polygon points="${hexPts(33)}" fill="none" stroke="${ring}" stroke-width="8" stroke-linejoin="round"/>` : ''}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/><polyline points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${y} 200"/><polyline points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="${t} 200"/><polygon points="${hexPts(13)}" fill="${fill}"/></svg>`;
     const K = matchMedia('(prefers-color-scheme: dark)').matches ? ['Weiß', 'weiß'] : ['Schwarz', 'schwarz']; // Balkenfarbe „gestern“ folgt dem Hell-/Dunkelmodus
     // Animierte Pin-Erklärung: großer Pin mit Hinweisstrichen
-    const SIZES = [['#e0483e', 'Kleines Gebiet', 'unter 8 km Piste'], ['#ef9f27', 'Mittleres Gebiet', '8–25 km Piste'], ['#2f7fd8', 'Großes Gebiet', 'ab 25 km Piste']];
+    const SIZES = [['#e0483e', 'Kleines Gebiet', 'unter 8 km Piste'], ['#ef9f27', 'Mittleres Gebiet', '8–25 km Piste'], [BIG, 'Großes Gebiet', 'ab 25 km Piste']];
     const apin = mode => {
       const lead = mode === 'size' ? `<line x1="8" y1="0" x2="52" y2="0" class="tLead"/><circle cx="8" cy="0" r="1.6" class="tDot"/><text x="55" y="1.6" class="tLbl">Farbe innen</text><text x="55" y="9" class="tLbl s">= Größe</text>`
         : mode === 'y' ? `<line x1="-21" y1="2" x2="-52" y2="2" class="tLead"/><circle cx="-21" cy="2" r="1.6" class="tDot"/><text x="-55" y="0" class="tLbl" text-anchor="end">linker Rand</text><text x="-55" y="8" class="tLbl s" text-anchor="end">= gestern</text>`
@@ -707,7 +729,7 @@
       return `<svg viewBox="-110 -44 220 86" class="tBig" aria-hidden="true">${lead}${full}<polygon points="${hexPts(30)}" style="fill:var(--card);stroke:var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><polygon points="${hexPts(21)}" fill="none" style="stroke:var(--track)" stroke-width="9" stroke-linejoin="round"/>`
         + `<polyline id="tBarY" points="${sidePts(21, -1)}" fill="none" style="stroke:var(--snowM)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="0 200" opacity="0"/>`
         + `<polyline id="tBarT" points="${sidePts(21, 1)}" fill="none" style="stroke:var(--snowY)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="0 200" opacity="0"/>`
-        + `<polygon id="tCore" points="${hexPts(13)}" fill="${mode === 'size' ? SIZES[0][0] : '#2f7fd8'}"/></svg>`;
+        + `<polygon id="tCore" points="${hexPts(13)}" fill="${mode === 'size' ? SIZES[0][0] : BIG}"/></svg>`;
     };
     let animId = 0;
     const animSize = () => {
@@ -717,11 +739,11 @@
       const next = () => { if (id !== animId || ++k > 2) return; set(k); setTimeout(next, 850); };
       setTimeout(next, 850);
     };
-    // Balken: 0,5 s Pause zum Orientieren → weich (langsam–schnell–langsam) bis 30 cm → 0,5 s halten → sanft auf den Wert zurück
+    // Balken: startet nach 0,1 s → weich (langsam–schnell–langsam) bis 30 cm → 0,5 s halten → sanft auf den Wert zurück
     const ease = f => f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2; // easeInOutCubic: Tempo wie eine Glockenkurve
     const animBar = (which, cm) => {
       const id = ++animId, el = $(which === 'y' ? '#tBarY' : '#tBarT'), out = $('#tCm');
-      const WAIT = 500, UP = 1300, HOLD = 500, DOWN = 700, MAX = 30, t0 = performance.now();
+      const WAIT = 100, UP = 1300, HOLD = 500, DOWN = 700, MAX = 30, t0 = performance.now();
       const draw = v => { el.setAttribute('stroke-dasharray', `${(v / 30 * 100).toFixed(1)} 200`); el.setAttribute('opacity', v > 0.4 ? 1 : 0); out.textContent = `${Math.round(v)} cm`; };
       if (!el) return; draw(0);
       const step = now => {
@@ -736,39 +758,64 @@
       };
       requestAnimationFrame(step);
     };
+    // „Gestern | Heute“-Schalter: groß und eindeutig; beim Wechsel klappt er auf „Heute“ um
+    const days = which => `<div class="tDays ${which}" aria-hidden="true"><span class="d y">Gestern</span><span class="d t">Heute</span></div>`;
+    // Einchecken: Pass-Balken, von dem der Tageskartenpreis abgezogen wird
+    const passDemo = () => {
+      const P = S.settings.pass || 500, day = 52;
+      $('#tpVal').textContent = `noch ${eur0(P)}`; $('#tpFill').style.width = '0%';
+      setTimeout(() => {
+        const t0 = performance.now(), D = 1100;
+        const step = now => { const f = Math.min(1, (now - t0) / D), e = ease(f); $('#tpFill') && ($('#tpFill').style.width = `${(day / P * 100 * e).toFixed(1)}%`); $('#tpVal') && ($('#tpVal').textContent = `noch ${eur0(P - day * e)}`); if (f < 1) requestAnimationFrame(step); };
+        requestAnimationFrame(step);
+      }, 400);
+    };
+    const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+    const ico = {
+      share: '<svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg>',
+      add: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>',
+      app: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M7 15l3-5 2 3 1.5-2 3.5 4z" class="f"/></svg>'
+    };
     const steps = [
       ['Willkommen 👋', `<p>Die Karte zeigt alle <b>38 Gebiete</b> deines 3TälerPass. Unten ist die <b>Liste</b> – nach oben ziehen zum Aufklappen.</p><p><b>Pin oder Listeneintrag antippen</b> öffnet das Gebiet mit Fotos, Webcams, Wetter und Parkplätzen.</p>`],
       ['Pin: Größe des Gebiets', `<div class="tAnim" data-anim="size">${apin('size')}</div>
         <div class="tCap"><span class="tSq" id="tSq"></span><b id="tCapT">Kleines Gebiet</b><span class="muted" id="tCapS">unter 8 km Piste</span></div>
-        <p class="muted small tHint">Die Farbe innen zeigt die Größe – rot, gelb oder blau.</p>`, () => animSize()],
-      ['Pin: Neuschnee gestern', `<div class="tAnim">${apin('y')}</div>
-        <div class="tCap"><b>Gestern</b><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee</span></div>
-        <p class="muted small tHint">Linker Rand (${K[1]}) = Neuschnee gestern. Ganz voll = 30 cm.</p>`, () => animBar('y', 18)],
-      ['Pin: Neuschnee heute', `<div class="tAnim">${apin('t')}</div>
-        <div class="tCap"><b>Heute</b><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee</span></div>
-        <p class="muted small tHint">Rechter Rand (grün) = Neuschnee heute. Ganz voll = 30 cm.</p>`, () => animBar('t', 24)],
-      ['Gold, Silber, Bronze', `<div class="tPin">${pin('#2f7fd8', 30, 60, MEDAL[1])}${pin('#ef9f27', 20, 40, MEDAL[2])}${pin('#2f7fd8', 10, 50, MEDAL[3])}</div><p>Die drei Gebiete mit den <b>besten Bedingungen für morgen</b> bekommen einen farbigen Rahmen – aus Wetter, Schnee, Panorama, Pistengröße, offenen Liften und (wenig) Anfahrt.</p>`],
-      ['Ein Gebiet im Detail', `<p>Oben vier Kacheln: <b>Fahrtzeit</b> ab deinem Wohnort, <b>offene Lifte</b> (live von 3Täler) und die <b>Sicht</b> heute und morgen in Sternen – 5 Sterne heißt Sonne ohne Wolken.</p><p>Darunter Wetter für 7 Tage, <b>Parkplätze</b> mit Link zu Google Maps und die Website des Gebiets.</p>`],
-      ['Einchecken lohnt sich', `<p>Tippe im Gebiet unten auf <b>„Einchecken“</b>. Die App zählt den Tageskartenpreis zu deiner Bilanz.</p><p>Die Bilanz (Geldbörse rechts) startet bei <b>−500 €</b> und wird <b style="color:var(--green)">grün</b>, sobald sich der Pass gelohnt hat.</p>`],
-      ['Filtern & Würfeln', `<p>Oben die <b>Filter</b>: ≤ 1 h Fahrt, Neuschnee, Favoriten, große Gebiete und gute Sicht heute oder morgen – kombinierbar.</p><p>Die Liste sortierst du nach <b>Fahrtzeit, Neuschnee oder Pisten-km</b>. Der <b>Würfel</b> lost ein Gebiet aus.</p>`],
-      ['Deine Daten', `<p>Favoriten, Skitage und Einstellungen liegen <b>nur auf diesem Gerät</b> – kein Konto, nichts wird hochgeladen.</p><p>Tipp: Über Teilen → <b>„Zum Home-Bildschirm“</b> als App speichern und ab und zu in der Bilanz eine <b>Sicherung</b> machen.</p>`],
-      ['Bitte beachten', `<p><b>Keine offizielle Software.</b> Diese App ist ein privates Projekt und steht in keiner Verbindung zum 3TälerPass oder zu den Liftbetreibern.</p><p>Alle Angaben (Schnee, Wetter, Lifte, Preise, Fahrtzeiten, Parkplätze) ohne Gewähr – maßgeblich sind die offiziellen Seiten. <b>Es wird keine Haftung übernommen.</b></p><p>Nutzung nur <b>privat und nicht kommerziell</b>. Kopieren, Weitergeben des Codes oder Nachbauen ist nicht erlaubt.</p>`]
+        <p class="muted small tHint">Die Farbe innen zeigt die Größe – rot, gelb oder grün.</p>`, () => animSize()],
+      ['Pin: Neuschnee gestern', `${days('y')}<div class="tAnim">${apin('y')}</div>
+        <div class="tCap"><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee gestern</span></div>
+        <p class="muted small tHint">Linker Rand (${K[1]}) = gestern. Ganz voll = 30 cm.</p>`, () => animBar('y', 18)],
+      ['Pin: Neuschnee heute', `${days('t flip')}<div class="tAnim">${apin('t')}</div>
+        <div class="tCap"><span class="tNum" id="tCm">0 cm</span><span class="muted">Neuschnee heute</span></div>
+        <p class="muted small tHint">Rechter Rand (blau) = heute. Ganz voll = 30 cm.</p>`, () => animBar('t', 24)],
+      ['Gold, Silber, Bronze', `<div class="tPin big">${pin(BIG, 30, 60, MEDAL[1])}${pin('#ef9f27', 20, 40, MEDAL[2])}${pin(BIG, 10, 50, MEDAL[3])}</div>
+        <p class="tLead1">Die <b>3 besten Gebiete für morgen</b>.</p><p class="muted small tHint">Dahinter steckt eine Bewertung aus Wetter, Schnee und mehr.</p>`],
+      ['Ein Gebiet im Detail', `<p class="tLead1">Hier siehst du auf einen Blick:</p>
+        <div class="tChips"><span>🚗 <b>Fahrtzeit</b></span><span>🚡 <b>Offene Lifte</b></span><span>☀️ <b>Sicht &amp; Wetter</b> für die nächsten Tage</span><span>🅿️ <b>Parkplätze</b></span></div>`],
+      ['Einchecken lohnt sich', `<div class="tPass"><div class="tpTop"><span>Dein Pass</span><b class="num" id="tpVal"></b></div>
+          <div class="tpBar"><i id="tpFill"></i></div>
+          <div class="tpTag">✓ Einchecken · Tageskarte <b class="num">52 €</b> wird abgezogen</div></div>
+        <p class="tLead1">Jeder Skitag zählt: Beim <b>Einchecken</b> wird der Preis der Tageskarte von deinen <b>${eur0(S.settings.pass || 500)}</b> abgezogen.</p>
+        <p class="muted small tHint">Bei 0 € hat sich der Pass bezahlt – ab dann sparst du.</p>`, () => passDemo()],
+      ['Zum Home-Bildschirm', `<div class="tHome"><div><span class="hi">${ico.share}</span><small>1. Teilen</small></div><i>›</i><div><span class="hi">${ico.add}</span><small>2. „Zum Home-Bildschirm“</small></div><i>›</i><div><span class="hi app">${ico.app}</span><small>3. Fertig</small></div></div>
+        ${standalone ? '<p class="tLead1">✓ <b>Erledigt</b> – du nutzt die App schon vom Home-Bildschirm.</p>' : '<p class="tLead1">In Safari unten auf <b>Teilen</b> tippen, dann <b>„Zum Home-Bildschirm“</b>.</p>'}
+        <p class="muted small tHint">Wichtig: Safari löscht Daten von Webseiten, die du länger nicht öffnest. Als App auf dem Home-Bildschirm bleiben deine Skitage erhalten.</p>`],
+      ['Bitte beachten', `<p class="tData">🔒 Deine Daten bleiben <b>nur auf diesem Gerät</b> – kein Konto, kein Upload.</p><p><b>Keine offizielle Software.</b> Diese App ist ein privates Projekt und steht in keiner Verbindung zum 3TälerPass oder zu den Liftbetreibern.</p><p>Alle Angaben (Schnee, Wetter, Lifte, Preise, Fahrtzeiten, Parkplätze) ohne Gewähr – maßgeblich sind die offiziellen Seiten. <b>Es wird keine Haftung übernommen.</b></p><p>Nutzung nur <b>privat und nicht kommerziell</b>. Kopieren, Weitergeben des Codes oder Nachbauen ist nicht erlaubt.</p>`]
     ];
     let i = start || 0;
     const show = () => {
       const [h, body] = steps[i];
       modal(`<div class="tour">
-        <div class="mHead"><div class="h2">${h}</div><span class="muted small num">${i + 1}/${steps.length}</span></div>
+        <div class="mHead"><div class="h2">${h}</div><span class="tHeadR"><span class="muted small num">${i + 1}/${steps.length}</span>${i >= 4 ? '<button class="iconBtn" data-tour="close" aria-label="Einführung schließen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' : ''}</span></div>
         <div class="tBody">${body}</div>
         <div class="tDots">${steps.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
         <div class="btnGrid">${i ? '<button class="btn" data-tour="back">Zurück</button>' : '<span></span>'}<button class="btn primary" data-tour="next">${i === steps.length - 1 ? 'Verstanden – los geht’s' : 'Weiter'}</button></div></div>`, 'tour');
-      animId++; const run = steps[i][2]; if (run) { run(); $('#modal .tAnim').onclick = () => run(); }
+      animId++; const run = steps[i][2]; if (run) { run(); const a = $('#modal .tAnim') || $('#modal .tPass'); if (a) a.onclick = () => { animId++; run(); }; }
       $('#modal').querySelectorAll('[data-tour]').forEach(b => b.onclick = e => {
         e.stopPropagation();
         const a = b.dataset.tour;
         if (a === 'next' && i < steps.length - 1) { i++; show(); return; }
         if (a === 'back') { i--; show(); return; }
-        if (a === 'next') { S.toured = true; S.tourV = TOUR_V; save(); closeModal(); }
+        if (a === 'next' || a === 'close') { S.toured = true; S.tourV = TOUR_V; save(); closeModal(); }
       });
     };
     show();
@@ -868,7 +915,6 @@
     };
   });
   $('#btnWallet').onclick = openWallet;
-  $('#btnDice').onclick = openDice;
 
   // Standort: zeigt dich auf der Karte und bietet den Check-in an, wenn du in einem Gebiet bist
   let me = null;
@@ -876,14 +922,14 @@
     if (!navigator.geolocation) { toast('Standort wird nicht unterstützt'); return; }
     navigator.geolocation.getCurrentPosition(pos => {
       const ll = [pos.coords.latitude, pos.coords.longitude];
-      if (!me) me = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="me-dot"></div>', iconSize: [18, 18] }), interactive: false }).addTo(map);
-      else me.setLatLng(ll);
-      const near = R.map(r => ({ r, d: map.distance(ll, [r.lat, r.lon]) })).sort((a, b) => a.d - b.d)[0];
+      if (!me) me = dot('me-dot', ll[0], ll[1]);
+      else me.setLngLat([ll[1], ll[0]]);
+      const near = R.map(r => ({ r, d: distM(ll, [r.lat, r.lon]) })).sort((a, b) => a.d - b.d)[0];
       if (near.d < 5000 && !near.r.noSki) {
         openDetail(near.r.id, true);
         toast(`Du bist bei ${near.r.name}`, 'Einchecken', () => openCheckin(near.r.id));
       } else {
-        map.flyTo(ll, Math.max(map.getZoom(), 10));
+        map.flyTo({ center: [ll[1], ll[0]], zoom: Math.max(map.getZoom(), 9) });
         toast(`Nächstes Gebiet: ${near.r.name} (${(near.d / 1000).toFixed(0)} km Luftlinie)`);
       }
     }, () => toast('Standort nicht freigegeben'), { enableHighAccuracy: true, timeout: 10000 });

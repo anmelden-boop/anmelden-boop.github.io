@@ -120,6 +120,10 @@ window.RESORTS=[
 "fee": 1,
 "lift": "Körbliftle"
 }
+],
+"season": [
+"2026-12-04",
+"2027-04-11"
 ]
 },
 {
@@ -213,6 +217,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": ""
 }
+],
+"season": [
+"2026-12-04",
+"2027-04-04"
 ]
 },
 {
@@ -325,6 +333,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": ""
 }
+],
+"season": [
+"2026-12-12",
+"2027-04-04"
 ]
 },
 {
@@ -405,6 +417,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Paludalift"
 }
+],
+"season": [
+"2026-12-11",
+"2027-04-11"
 ]
 },
 {
@@ -453,6 +469,16 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/schneereich-faschina008.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Faschina_Panorama.jpg/960px-Faschina_Panorama.jpg",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Faschina_Panorama.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Hahnenkopf_Faschina.jpg/960px-Hahnenkopf_Faschina.jpg",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Hahnenkopf_Faschina.jpg"
 }
 ],
 "web": "https://www.seilbahnen-faschina.at",
@@ -476,6 +502,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Guggernülli"
 }
+],
+"season": [
+"2026-12-18",
+"2027-04-04"
 ]
 },
 {
@@ -555,6 +585,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Höflealplift"
 }
+],
+"season": [
+"2026-12-19",
+"2027-03-14"
 ]
 },
 {
@@ -631,6 +665,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Sesselbahn Gapfohl"
 }
+],
+"season": [
+"2026-12-04",
+"2027-03-29"
 ]
 },
 {
@@ -710,6 +748,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Haldenlift"
 }
+],
+"season": [
+"2026-12-04",
+"2027-03-29"
 ]
 },
 {
@@ -754,6 +796,11 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/i-winter-10.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Imbergbahn_bei_Oberstaufen.jpg/960px-Imbergbahn_bei_Oberstaufen.jpg",
+"c": "Stefan Oemisch · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Imbergbahn_bei_Oberstaufen.jpg"
 }
 ],
 "web": "https://www.huendle-imberg.de",
@@ -786,6 +833,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Imbergbahn"
 }
+],
+"season": [
+"2026-12-19",
+"2027-04-04"
 ]
 },
 {
@@ -822,6 +873,11 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/2021-01-11.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/H%C3%BCndle-Bergbahn_und_Skipiste_bei_Oberstaufen.jpg/960px-H%C3%BCndle-Bergbahn_und_Skipiste_bei_Oberstaufen.jpg",
+"c": "Stefan Oemisch · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:H%C3%BCndle-Bergbahn_und_Skipiste_bei_Oberstaufen.jpg"
 }
 ],
 "web": "https://www.huendle-imberg.de",
@@ -836,6 +892,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Hündle Bahn"
 }
+],
+"season": [
+"2026-12-23",
+"2027-03-07"
 ]
 },
 {
@@ -906,6 +966,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Schlepplift Kopach"
 }
+],
+"season": [
+"2026-12-05",
+"2027-03-29"
 ]
 },
 {
@@ -977,6 +1041,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Hochlittenlift"
 }
+],
+"season": [
+"2026-12-12",
+"2027-04-04"
 ]
 },
 {
@@ -1043,6 +1111,10 @@ window.RESORTS=[
 "fee": 1,
 "lift": "Hochgratbahn"
 }
+],
+"season": [
+"2026-12-25",
+"2027-04-04"
 ]
 },
 {
@@ -1067,6 +1139,11 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/12011405.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Sonntag_von_S%C3%BCden.jpg/960px-Sonntag_von_S%C3%BCden.jpg",
+"c": "32-Fuß-Freak · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Sonntag_von_S%C3%BCden.jpg"
 }
 ],
 "web": "https://www.seilbahnen-sonntag.at/de",
@@ -1090,6 +1167,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Pendelbahn Sonntag-Stein"
 }
+],
+"season": [
+"2026-12-19",
+"2027-04-04"
 ]
 },
 {
@@ -1152,6 +1233,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Tobel"
 }
+],
+"season": [
+"2026-12-19",
+"2027-03-14"
 ]
 },
 {
@@ -1183,6 +1268,16 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/lechtal-alexkaiser-1044.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Bach_im_Winter.jpg/960px-Bach_im_Winter.jpg",
+"c": "Bacher43 · CC BY-SA 3.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Bach_im_Winter.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flug_%C3%BCber_bach.jpg/960px-Flug_%C3%BCber_bach.jpg",
+"c": "Bacher43 · CC BY-SA 3.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Flug_%C3%BCber_bach.jpg"
 }
 ],
 "web": "https://www.lechtaler-bergbahnen.at",
@@ -1206,6 +1301,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Babylift Jöchelspitze"
 }
+],
+"season": [
+"2026-12-19",
+"2027-03-21"
 ]
 },
 {
@@ -1272,6 +1371,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Seilbahn Bezau"
 }
+],
+"season": [
+"2026-12-24",
+"2027-03-07"
 ]
 },
 {
@@ -1330,6 +1433,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": ""
 }
+],
+"season": [
+"2026-12-05",
+"2027-03-14"
 ]
 },
 {
@@ -1343,7 +1450,7 @@ window.RESORTS=[
 "base": null,
 "top": null,
 "lifts": 2,
-"price": null,
+"price": 34.0,
 "link": "https://www.3taeler.at/de/skiregion/liftbetriebe-alberschwende.html",
 "roadKm": 50.3,
 "driveMin": 44,
@@ -1353,6 +1460,31 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/20210121-145318-1.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Br%C3%BCggele_01.JPG/960px-Br%C3%BCggele_01.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Br%C3%BCggele_01.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Br%C3%BCggele_02.JPG/960px-Br%C3%BCggele_02.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Br%C3%BCggele_02.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Skil%C3%A4ufer_B%C3%B6hringer.JPG/960px-Skil%C3%A4ufer_B%C3%B6hringer.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Skil%C3%A4ufer_B%C3%B6hringer.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Br%C3%BCggelekopf_Kanisfluh.JPG/960px-Br%C3%BCggelekopf_Kanisfluh.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Br%C3%BCggelekopf_Kanisfluh.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Alberschwende_Brueggelekopf_Bergstation_Tafel.jpg/960px-Alberschwende_Brueggelekopf_Bergstation_Tafel.jpg",
+"c": "Asurnipal · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Alberschwende_Brueggelekopf_Bergstation_Tafel.jpg"
 }
 ],
 "web": "https://www.skilifte-alberschwende.at",
@@ -1376,6 +1508,11 @@ window.RESORTS=[
 "fee": null,
 "lift": "Zipfellift 2.0"
 }
+],
+"priceSrc": "Betreiber, Erwachsene 2026/27",
+"season": [
+"2026-12-19",
+"2027-02-28"
 ]
 },
 {
@@ -1403,6 +1540,21 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/img-20160118-144834.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Skigebiet_Gr%C3%B6llerkopf.jpg/960px-Skigebiet_Gr%C3%B6llerkopf.jpg",
+"c": "Reinhard Müller · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Skigebiet_Gr%C3%B6llerkopf.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Uebersaxen-Winter.jpg/960px-Uebersaxen-Winter.jpg",
+"c": "JosefBreuss · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Uebersaxen-Winter.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/%C3%9Cbersaxen_01.JPG/960px-%C3%9Cbersaxen_01.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 2.5 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:%C3%9Cbersaxen_01.JPG"
 }
 ],
 "web": "https://www.uebersaxen.at",
@@ -1440,6 +1592,31 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/ebnitwintercdornbirnerseilbahnag.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Dornbirn-Ebnit-Ski_lift_Heumoeser-01MND.jpg/960px-Dornbirn-Ebnit-Ski_lift_Heumoeser-01MND.jpg",
+"c": "Michael Nosko · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-Ebnit-Ski_lift_Heumoeser-01MND.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Dornbirn-Ebnit-Ski_lift_Heumoeser-02MND.jpg/960px-Dornbirn-Ebnit-Ski_lift_Heumoeser-02MND.jpg",
+"c": "Michael Nosko · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-Ebnit-Ski_lift_Heumoeser-02MND.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Dornbirn-Ebnit-Ski_lift_Heumoeser-03MND.jpg/960px-Dornbirn-Ebnit-Ski_lift_Heumoeser-03MND.jpg",
+"c": "Michael Nosko · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-Ebnit-Ski_lift_Heumoeser-03MND.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Dornbirn-Ebnit-Ski_lift_Heumoeser-04MND.jpg/960px-Dornbirn-Ebnit-Ski_lift_Heumoeser-04MND.jpg",
+"c": "Michael Nosko · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-Ebnit-Ski_lift_Heumoeser-04MND.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Dornbirn-Ebnit-Ski_lift_Heumoeser-05MND.jpg/960px-Dornbirn-Ebnit-Ski_lift_Heumoeser-05MND.jpg",
+"c": "Michael Nosko · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-Ebnit-Ski_lift_Heumoeser-05MND.jpg"
 }
 ],
 "parking": []
@@ -1492,6 +1669,10 @@ window.RESORTS=[
 "fee": 1,
 "lift": "Gföllberglift"
 }
+],
+"season": [
+"2026-12-19",
+"2027-02-28"
 ]
 },
 {
@@ -1524,6 +1705,11 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/img-8795.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Sibratsgf%C3%A4ll_und_Hittisberg.jpg/960px-Sibratsgf%C3%A4ll_und_Hittisberg.jpg",
+"c": "Robinhood50 · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Sibratsgf%C3%A4ll_und_Hittisberg.jpg"
 }
 ],
 "web": "https://www.hittisau.at",
@@ -1538,6 +1724,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Skilift Hittisberg"
 }
+],
+"season": [
+"2026-12-26",
+"2027-03-14"
 ]
 },
 {
@@ -1591,6 +1781,10 @@ window.RESORTS=[
 "fee": 0,
 "lift": "Krähenberglift"
 }
+],
+"season": [
+"2026-12-19",
+"2027-03-14"
 ]
 },
 {
@@ -1636,6 +1830,10 @@ window.RESORTS=[
 "fee": null,
 "lift": ""
 }
+],
+"season": [
+"2026-12-05",
+"2027-02-28"
 ]
 },
 {
@@ -1649,7 +1847,7 @@ window.RESORTS=[
 "base": 705,
 "top": 880,
 "lifts": 2,
-"price": null,
+"price": 20.0,
 "link": "https://www.3taeler.at/de/skiregion/schiliftgesellschaft-schneiderkopf-buch.html",
 "roadKm": 44.4,
 "driveMin": 42,
@@ -1663,6 +1861,16 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/rodelvergnuegen.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer.jpg/960px-Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer.jpg",
+"c": "Friedrich Böhringer · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer_01.JPG/960px-Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer_01.JPG",
+"c": "Friedrich Böhringer · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Buch_in_Vorarlberg%2C_2020_B%C3%B6hringer_01.JPG"
 }
 ],
 "parking": [
@@ -1675,6 +1883,11 @@ window.RESORTS=[
 "fee": 0,
 "lift": ""
 }
+],
+"priceSrc": "hdsports.org, ältere Angabe",
+"season": [
+"2027-01-09",
+"2027-03-14"
 ]
 },
 {
@@ -1729,6 +1942,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Übungslift Sinswang"
 }
+],
+"season": [
+"2026-12-12",
+"2027-03-07"
 ]
 },
 {
@@ -1756,6 +1973,26 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/img-0608.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Hirschbergbahn_Winter.JPG/960px-Hirschbergbahn_Winter.JPG",
+"c": "Schwabe97 · CC BY-SA 3.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Hirschbergbahn_Winter.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Hirschbergbahn.JPG/960px-Hirschbergbahn.JPG",
+"c": "Schwabe97 · CC BY-SA 3.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Hirschbergbahn.JPG"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bizau_Winter_Vogelperspektive.jpg/960px-Bizau_Winter_Vogelperspektive.jpg",
+"c": "Herbert Heim · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Bizau_Winter_Vogelperspektive.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Bizau_im_Winter_Vogelperspektive.jpg/960px-Bizau_im_Winter_Vogelperspektive.jpg",
+"c": "Herbert Heim · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Bizau_im_Winter_Vogelperspektive.jpg"
 }
 ],
 "web": "https://www.bizau.at",
@@ -1803,6 +2040,11 @@ window.RESORTS=[
 {
 "u": "https://ski.3taeler.at/media/gallery/karren-winter-c-dsg-03.jpg",
 "c": "3TälerPass / Betreiber"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Dornbirn-In_F%C3%A4ngen-Ried_in_Winter-Breitenberg-Blum_Werk_8-Karren-03ASD.jpg/960px-Dornbirn-In_F%C3%A4ngen-Ried_in_Winter-Breitenberg-Blum_Werk_8-Karren-03ASD.jpg",
+"c": "Asurnipal · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Dornbirn-In_F%C3%A4ngen-Ried_in_Winter-Breitenberg-Blum_Werk_8-Karren-03ASD.jpg"
 }
 ],
 "web": "https://www.karren.at",
@@ -1835,6 +2077,10 @@ window.RESORTS=[
 "fee": null,
 "lift": "Karrenseilbahn"
 }
+],
+"season": [
+"2026-01-01",
+"2027-12-31"
 ]
 },
 {
@@ -1880,6 +2126,11 @@ window.RESORTS=[
 {
 "u": "https://cdn.prod.website-files.com/5fcf7561abc0a207e90d52fe/5fd27620052d1b1e85c96122_93052D81-C492-4198-A851-1EB430478796-p-1600.jpeg",
 "c": "Skilifte Gurtis"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Frastanz-Skilift_Bazora-01ASD.jpg/960px-Frastanz-Skilift_Bazora-01ASD.jpg",
+"c": "Asurnipal · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Frastanz-Skilift_Bazora-01ASD.jpg"
 }
 ],
 "web": "https://www.schilift-bazora.at",
@@ -1970,6 +2221,11 @@ window.RESORTS=[
 {
 "u": "https://www.dorflift.com/images/Dorflift_Kirmair.jpg",
 "c": "Dorflift Sulzberg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Sulzberg_Jan2006.jpg/960px-Sulzberg_Jan2006.jpg",
+"c": "Alois Sutter · frei nutzbar · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Sulzberg_Jan2006.jpg"
 }
 ],
 "web": "https://www.dorflift.com",
@@ -2015,7 +2271,7 @@ window.RESORTS=[
 "base": 631,
 "top": 818,
 "lifts": 1,
-"price": null,
+"price": 12.5,
 "link": "https://www.3taeler.at/de/3-taeler-skigebiete.html",
 "roadKm": 66.1,
 "driveMin": 65,
@@ -2035,6 +2291,11 @@ window.RESORTS=[
 "fee": null,
 "lift": "Skilift Baienberg"
 }
+],
+"priceSrc": "hdsports.org, ältere Angabe",
+"season": [
+"2026-12-26",
+"2027-03-14"
 ]
 },
 {
@@ -2071,6 +2332,16 @@ window.RESORTS=[
 {
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/skilift.webp",
 "c": "Lechtal Tourismus"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Flug_%C3%BCber_bach.jpg/960px-Flug_%C3%BCber_bach.jpg",
+"c": "Bacher43 · CC BY-SA 3.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:Flug_%C3%BCber_bach.jpg"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/20150207_LechtalDunst_DSCN0591_PtrQs.JPG/960px-20150207_LechtalDunst_DSCN0591_PtrQs.JPG",
+"c": "PtrQs · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:20150207_LechtalDunst_DSCN0591_PtrQs.JPG"
 }
 ],
 "web": "https://www.knitteltirol.at",
@@ -2150,6 +2421,10 @@ window.RESORTS=[
 "fee": 1,
 "lift": "Stoamandllift"
 }
+],
+"season": [
+"2026-12-19",
+"2027-03-07"
 ]
 },
 {
@@ -2259,6 +2534,11 @@ window.RESORTS=[
 {
 "u": "https://tourism.lechtal.at/media/infrastructure/teaser/lift-1.webp",
 "c": "Lechtal Tourismus"
+},
+{
+"u": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/20220128_Pfarrkirche_H%C3%A4selgehr_DSC02279_PtrQs.jpg/960px-20220128_Pfarrkirche_H%C3%A4selgehr_DSC02279_PtrQs.jpg",
+"c": "PtrQs · CC BY-SA 4.0 · Wikimedia Commons",
+"l": "https://commons.wikimedia.org/wiki/File:20220128_Pfarrkirche_H%C3%A4selgehr_DSC02279_PtrQs.jpg"
 }
 ],
 "web": "https://www.lechtal.at",

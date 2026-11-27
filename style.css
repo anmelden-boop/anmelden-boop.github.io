@@ -2,7 +2,7 @@
 :root{
   --bg:#f4f5f6; --card:#ffffff; --ink:#15181b; --muted:#646b73; --line:rgba(0,0,0,.09);
   --accent:#1f6fd1; --green:#2f8a3e; --red:#c8352b; --chip:#ffffff; --shadow:0 4px 18px rgba(0,0,0,.14);
-  --snowY:#5a9e2a; --snowM:#1b1d20; --track:rgba(120,120,120,.28);
+  --snowY:#2f7fd8; --snowM:#1b1d20; --track:rgba(120,120,120,.28);
   --head:56px;
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
 }
@@ -10,7 +10,7 @@
   :root{
     --bg:#121416; --card:#1c1f23; --ink:#eef0f2; --muted:#9aa2ab; --line:rgba(255,255,255,.09);
     --accent:#5aa2f0; --green:#5cc26b; --red:#ff6b5f; --chip:#24282d; --shadow:0 4px 18px rgba(0,0,0,.5);
-    --snowM:#f2f4f6; --track:rgba(200,200,200,.22);
+    --snowY:#5aa2f0; --snowM:#f2f4f6; --track:rgba(200,200,200,.22);
   }
 }
 *{box-sizing:border-box;min-width:0}
@@ -22,18 +22,18 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .h2{font-size:19px;font-weight:600}
 .num{font-variant-numeric:tabular-nums}
 
-/* ===== Karte (monochrom) ===== */
-#map{position:fixed;inset:0;background:var(--bg)}
-.leaflet-tile-pane{filter:grayscale(1) contrast(.92) brightness(1.04)}
-@media (prefers-color-scheme:dark){ .leaflet-tile-pane{filter:grayscale(1) invert(1) brightness(.82) contrast(.92)} }
-.leaflet-control-attribution{font-size:10px;background:rgba(255,255,255,.7)!important}
-@media (prefers-color-scheme:dark){ .leaflet-control-attribution{background:rgba(0,0,0,.55)!important;color:#bbb} .leaflet-control-attribution a{color:#9cf} }
-.leaflet-control-zoom{display:none}
-.pin{background:none;border:0}
+/* ===== Karte (OpenFreeMap, Hell-/Dunkel-Beige) ===== */
+#map{position:fixed;inset:0;background:#f1e9da}
+@media (prefers-color-scheme:dark){ #map{background:#2c2822} }
+.maplibregl-ctrl-top-right{top:calc(env(safe-area-inset-top) + 58px)}
+.maplibregl-ctrl-attrib{font-size:10px}
+.maplibregl-ctrl-attrib.maplibregl-compact{background:rgba(255,255,255,.75)}
+@media (prefers-color-scheme:dark){ .maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib.maplibregl-compact{background:rgba(0,0,0,.55);color:#ccc} .maplibregl-ctrl-attrib a{color:#cdb} .maplibregl-ctrl-attrib-button{filter:invert(1)} }
+.pin{background:none;border:0;cursor:pointer}
+.pin .pw{position:relative;width:100%;height:100%}
 .pin svg{display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
 .pin.dim{opacity:.18}
-.lbl{background:var(--card);color:var(--ink);border:0;box-shadow:var(--shadow);font-size:12px;font-weight:600;padding:2px 6px;border-radius:6px;display:none}
-.lbl:before{display:none}
+.lbl{position:absolute;left:50%;top:100%;transform:translate(-50%,1px);white-space:nowrap;background:var(--card);color:var(--ink);box-shadow:var(--shadow);font-size:12px;font-weight:600;padding:2px 6px;border-radius:6px;display:none;pointer-events:none}
 .show-labels .lbl{display:block}
 .home-dot{width:16px;height:16px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:var(--shadow)}
 .me-dot{width:18px;height:18px;border-radius:50%;background:#2a7bf6;border:3px solid #fff;box-shadow:0 0 0 6px rgba(42,123,246,.25)}
@@ -92,7 +92,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .snowGrid div{background:var(--bg);border-radius:12px;padding:8px 4px;text-align:center}
 .snowGrid b{display:block;font-size:17px;font-weight:600}
 .snowGrid span{font-size:11px;color:var(--muted)}
-.snowGrid .gy{background:rgba(90,158,42,.15)} .snowGrid .gy b{color:var(--snowY)}
+.snowGrid .gy{background:rgba(47,127,216,.15)} .snowGrid .gy b{color:var(--snowY)}
 .snowGrid .gd{background:rgba(128,128,128,.16)} .snowGrid .gd b{color:var(--snowM)}
 .pano{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);margin-top:8px}
 .mtns{display:flex;gap:3px}
@@ -278,3 +278,40 @@ textarea{width:100%;min-height:90px;font:13px ui-monospace,monospace;color:var(-
 .party.small .partyCard{pointer-events:auto;padding:14px 20px;font-size:15px;gap:2px}
 .party.small .partyCard .num{font-size:inherit}
 .partyCard{max-width:min(320px,84vw);text-align:center}
+
+/* Rang in der Liste (Sortierung „Empfohlen“) */
+.rk{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;margin-right:6px;border-radius:11px;background:var(--line);color:var(--ink);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;vertical-align:1px}
+.rk.top{color:#15181b}
+/* Saison-Punkt neben dem Gebietsnamen */
+.sDot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:4px;vertical-align:2px;box-shadow:0 0 0 2px var(--card)}
+.sDot.on{background:#2fae4e}
+.sDot.off{background:#d6453b}
+.sDot.snow{background:#9aa2ab}
+/* Einführung v3 */
+.tHeadR{display:flex;align-items:center;gap:6px}
+.tDays{display:flex;justify-content:center;gap:0;margin:2px auto 6px;width:max-content;border-radius:14px;background:var(--line);padding:4px;perspective:400px}
+.tDays .d{font-size:21px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 16px;border-radius:10px;color:var(--muted);opacity:.55}
+.tDays.y .d.y{background:var(--snowM);color:var(--card);opacity:1}
+.tDays.t .d.t{background:var(--snowY);color:#fff;opacity:1}
+.tDays.flip .d.t{animation:dayFlip .55s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes dayFlip{0%{transform:rotateX(90deg);opacity:0}100%{transform:none;opacity:1}}
+.tPin.big svg{width:84px;height:84px}
+.tLead1{font-size:17px;text-align:center;margin:6px 0}
+.tChips{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.tChips span{background:var(--line);border-radius:12px;padding:10px 12px;font-size:16px}
+.tPass{background:var(--bg);border-radius:14px;padding:12px 14px;margin:4px 0 8px;box-shadow:inset 0 0 0 1px var(--line)}
+.tpTop{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+.tpTop b{font-size:18px}
+.tpBar{position:relative;height:14px;border-radius:7px;background:var(--red);overflow:hidden}
+.tpBar i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--green);box-shadow:0 0 10px var(--green)}
+.tpTag{margin-top:8px;font-size:13px;color:var(--muted)}
+.tHome{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 0 6px}
+.tHome>div{display:flex;flex-direction:column;align-items:center;gap:4px;width:92px;text-align:center}
+.tHome>i{font-style:normal;font-size:22px;color:var(--muted)}
+.tHome small{font-size:12px;line-height:1.25}
+.tHome .hi{display:grid;place-items:center;width:54px;height:54px;border-radius:14px;background:var(--line)}
+.tHome .hi svg{width:30px;height:30px;fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tHome .hi.app{background:var(--accent)} .tHome .hi.app svg{stroke:#fff} .tHome .hi.app .f{fill:#fff;stroke:none}
+.tData{background:var(--line);border-radius:12px;padding:10px 12px}
+.tPin.big{justify-content:center}
+a.cap{text-decoration:none}
