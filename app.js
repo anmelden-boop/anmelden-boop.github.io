@@ -81,14 +81,12 @@
     parts.push([0.25, snowQ]);                                                                  // Schnee
     parts.push([0.20, (panoOf(r) - 1) / 4]);                                                    // Panorama
     parts.push([0.15, Math.log(1 + sizeKm(r)) / Math.log(1 + 90)]);                             // Pistengröße
-    const L = lifts[r.id]; if (L && L.total) parts.push([0.10, L.open / L.total]);              // offene Lifte
     parts.push([0.05, 1 - Math.min(1, driveMin(r) / 150)]);                                      // Anfahrt
     const wsum = parts.reduce((a, p) => a + p[0], 0);
     let sc = parts.reduce((a, p) => a + p[0] * p[1], 0) / wsum;
     if (s.depth != null && s.depth < 15 && fresh < 10) sc *= 0.5; // zu wenig Schnee
-    if (L && L.total && L.open === 0) sc *= 0.2;                  // alles zu
-    if (r.season) { const d = new Date(); d.setDate(d.getDate() + 1); const tm = d.toLocaleDateString('sv-SE'); if (tm < r.season[0] || tm > r.season[1]) sc *= 0.15; } // morgen außerhalb der Saison
-    else sc *= L && L.st && L.st !== 'open' ? 0.15 : 0.7;          // kein fester Termin: Liftstatus „geschlossen“ zählt wie außerhalb der Saison
+    // Offen/geschlossen (Saisontermin, Liftstatus, offene Lifte) fließt bewusst NICHT in die Bewertung ein –
+    // das zeigt der Saisonpunkt. Bewertet werden nur Sicht, Schnee, Panorama, Größe und Anfahrt.
     return sc;
   }
   /* Abruf-Intervalle: jede Quelle nur so oft wie nötig, nie öfter als alle 30 Minuten (kein manuelles Neuladen).
@@ -1030,3 +1028,6 @@
     else if (hiddenAt && Date.now() - hiddenAt >= 30 * 60 * 1000 && $('#modalWrap').hidden) setTimeout(showHello, 400);
   });
 })();
+
+// Offline-Cache: App + Karte starten aus dem Speicher statt aus dem Netz
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
